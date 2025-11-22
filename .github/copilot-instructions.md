@@ -119,7 +119,12 @@ lib/
 
 ## General Best Practices
 
-1. **Mobile-first**: Design for mobile, enhance for desktop
+1. **Mobile-first responsive design**:
+   - Design and test for mobile screens first (320px-768px), then enhance for desktop
+   - Use responsive Tailwind classes (`sm:`, `md:`, `lg:`) to adapt layouts
+   - Stack elements vertically on mobile, use columns/sidebars only on larger screens
+   - Ensure touch targets are at least 44x44px for buttons and interactive elements
+   - Test all features work well on mobile before implementing desktop enhancements
 2. **Accessibility**: Semantic HTML, ARIA labels, keyboard navigation
 3. **Error handling**: Graceful degradation, clear error messages
 4. **Loading states**: Show feedback for async operations
