@@ -194,7 +194,9 @@ export default function AsciiConverter() {
 
             {/* Invert Toggle */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-slate-700 mb-2">Invert Colors</label>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
+                Invert Colors
+              </label>
               <Button
                 variant={invert ? 'primary' : 'secondary'}
                 fullWidth
@@ -204,7 +206,7 @@ export default function AsciiConverter() {
               </Button>
             </div>
 
-            <div className="border-t border-slate-200 my-6"></div>
+            <div className="border-t border-border my-6"></div>
 
             {/* Upload Button */}
             <div className="mb-4">
@@ -217,7 +219,9 @@ export default function AsciiConverter() {
               >
                 {isProcessing ? 'Loading...' : 'Upload Image'}
               </Button>
-              <p className="text-xs text-slate-500 mt-2 text-center">or paste image (Ctrl/Cmd+V)</p>
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                or paste image (Ctrl/Cmd+V)
+              </p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -243,7 +247,7 @@ export default function AsciiConverter() {
             {/* Action Buttons */}
             {asciiArt && (
               <>
-                <div className="border-t border-slate-200 my-6"></div>
+                <div className="border-t border-border my-6"></div>
                 <Button
                   variant={copyStatus === 'copied' ? 'success' : 'primary'}
                   fullWidth
@@ -263,7 +267,7 @@ export default function AsciiConverter() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Original Image */}
           <div>
-            <div className="bg-slate-100 rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-slate-200">
+            <div className="bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-border">
               {previewUrl ? (
                 <img
                   src={previewUrl}
@@ -271,7 +275,7 @@ export default function AsciiConverter() {
                   className="max-w-full max-h-full object-contain"
                 />
               ) : (
-                <div className="text-center text-slate-400">
+                <div className="text-center text-muted-foreground">
                   <p>No image loaded</p>
                 </div>
               )}
@@ -282,17 +286,17 @@ export default function AsciiConverter() {
           <div>
             <div
               ref={asciiContainerRef}
-              className="bg-white border border-slate-200 rounded-lg overflow-auto aspect-square"
+              className="bg-card border border-border rounded-lg overflow-auto aspect-square"
             >
               {asciiArt ? (
                 <pre
                   style={{ fontSize: `${fontSize}px`, lineHeight: '1.2' }}
-                  className="font-mono p-4 whitespace-pre h-full flex items-center justify-center"
+                  className="font-mono p-4 whitespace-pre h-full flex items-center justify-center text-foreground"
                 >
                   {asciiArt}
                 </pre>
               ) : (
-                <div className="flex items-center justify-center h-full text-slate-400">
+                <div className="flex items-center justify-center h-full text-muted-foreground">
                   <div className="text-center">
                     <p>ASCII art will appear here</p>
                   </div>

@@ -23,11 +23,11 @@ const tools = [
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16">
         <header className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-slate-900 mb-4">ImageLab</h1>
-          <p className="text-xl text-slate-600">
+          <h1 className="text-5xl font-bold text-foreground mb-4">ImageLab</h1>
+          <p className="text-xl text-muted-foreground">
             A collection of creative image tools for your projects
           </p>
         </header>
@@ -37,18 +37,18 @@ export default function Home() {
             <Link
               key={tool.href}
               href={tool.href}
-              className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-8 border border-slate-200 hover:border-slate-300"
+              className="group bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-8 border border-card-border hover:border-border"
             >
               <div className="text-5xl mb-4">{tool.icon}</div>
-              <h2 className="text-2xl font-semibold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">
+              <h2 className="text-2xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
                 {tool.name}
               </h2>
-              <p className="text-slate-600">{tool.description}</p>
+              <p className="text-muted-foreground">{tool.description}</p>
             </Link>
           ))}
         </div>
 
-        <footer className="text-center mt-16 text-slate-500">
+        <footer className="text-center mt-16 text-muted-foreground">
           <p>Built with Next.js, TypeScript, and Tailwind CSS</p>
         </footer>
       </div>

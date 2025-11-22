@@ -10,7 +10,10 @@ interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
 
 export function Card({ children, className = '', ...props }: CardProps) {
   return (
-    <div className={`bg-white rounded-xl border border-slate-200/60 ${className}`} {...props}>
+    <div
+      className={`bg-card rounded-xl border border-card-border/60 shadow-lg ${className}`}
+      {...props}
+    >
       {children}
     </div>
   )
@@ -26,7 +29,10 @@ export function CardHeader({ children, className = '', ...props }: CardHeaderPro
 
 export function CardTitle({ children, className = '', ...props }: CardHeaderProps) {
   return (
-    <h3 className={`text-base font-semibold text-slate-900 tracking-tight ${className}`} {...props}>
+    <h3
+      className={`text-base font-semibold text-foreground tracking-tight ${className}`}
+      {...props}
+    >
       {children}
     </h3>
   )

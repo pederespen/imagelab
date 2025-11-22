@@ -1,1 +1,46 @@
 @import 'tailwindcss';
+
+@theme {
+  /* Light mode colors */
+  --color-background: #f8fafc; /* slate-50 */
+  --color-foreground: #0f172a; /* slate-900 */
+  --color-card: #ffffff;
+  --color-card-border: #e2e8f0; /* slate-200 */
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0f172a;
+  --color-primary: #0f172a; /* slate-900 */
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f1f5f9; /* slate-100 */
+  --color-secondary-foreground: #0f172a;
+  --color-muted: #f1f5f9; /* slate-100 */
+  --color-muted-foreground: #64748b; /* slate-500 */
+  --color-accent: #f1f5f9;
+  --color-accent-foreground: #0f172a;
+  --color-border: #e2e8f0; /* slate-200 */
+  --color-input: #e2e8f0;
+  --color-ring: #94a3b8; /* slate-400 */
+  --color-success: #10b981; /* emerald-500 */
+}
+
+@layer base {
+  .dark {
+    --color-background: #0f172a; /* slate-900 */
+    --color-foreground: #f8fafc; /* slate-50 */
+    --color-card: #1e293b; /* slate-800 */
+    --color-card-border: #334155; /* slate-700 */
+    --color-popover: #1e293b;
+    --color-popover-foreground: #f8fafc;
+    --color-primary: #f8fafc; /* slate-50 */
+    --color-primary-foreground: #0f172a;
+    --color-secondary: #334155; /* slate-700 */
+    --color-secondary-foreground: #f8fafc;
+    --color-muted: #334155;
+    --color-muted-foreground: #94a3b8; /* slate-400 */
+    --color-accent: #334155;
+    --color-accent-foreground: #f8fafc;
+    --color-border: #334155;
+    --color-input: #334155;
+    --color-ring: #64748b; /* slate-500 */
+    --color-success: #059669; /* emerald-600 */
+  }
+}

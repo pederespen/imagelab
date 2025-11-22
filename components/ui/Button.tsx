@@ -10,10 +10,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-slate-900 hover:bg-slate-800 text-white shadow-sm',
-  secondary: 'bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300',
-  success: 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm',
-  ghost: 'hover:bg-slate-100 text-slate-700 border border-transparent hover:border-slate-200',
+  primary: 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg',
+  secondary:
+    'bg-secondary hover:bg-muted text-secondary-foreground border border-border shadow-sm hover:shadow-md',
+  success:
+    'bg-[rgb(var(--success))] hover:bg-[rgb(var(--success))]/90 text-white shadow-md hover:shadow-lg hover:scale-[1.02]',
+  ghost:
+    'bg-transparent hover:bg-secondary/50 text-foreground border border-border hover:border-primary/30',
 }
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -28,7 +31,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseClasses =
-      'font-medium rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1'
+      'font-medium rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1'
     const disabledClasses = disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
     const widthClass = fullWidth ? 'w-full' : ''
 

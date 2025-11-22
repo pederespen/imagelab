@@ -63,7 +63,7 @@ export function Dropdown({
   return (
     <div className={`w-full relative ${className}`} ref={dropdownRef}>
       {label && (
-        <label className="block text-xs font-medium text-slate-600 mb-2 uppercase tracking-wide">
+        <label className="block text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
           {label}
         </label>
       )}
@@ -71,8 +71,8 @@ export function Dropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full px-3 py-2.5 pr-9 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1 bg-white transition-all text-sm font-medium text-left relative cursor-pointer ${
-          error ? 'border-red-400' : 'border-slate-200 hover:border-slate-300'
+        className={`w-full px-3 py-2.5 pr-9 border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 bg-card text-foreground transition-all text-sm font-medium text-left relative cursor-pointer ${
+          error ? 'border-red-400' : 'border-input hover:border-border'
         }`}
       >
         <span className="block truncate">{selectedOption?.label || 'Select...'}</span>
@@ -86,7 +86,8 @@ export function Dropdown({
           >
             <path
               d="M1 1L5 5L9 1"
-              stroke="#64748B"
+              stroke="currentColor"
+              className="text-muted-foreground"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -96,16 +97,16 @@ export function Dropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute z-10 mt-1 left-0 right-0 bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-50 mt-1 left-0 right-0 bg-popover border border-card-border rounded-lg shadow-xl max-h-60 overflow-auto">
           {options.map(option => (
             <button
               key={option.value}
               type="button"
               onClick={() => handleSelect(option.value)}
-              className={`w-full px-3 py-2.5 text-left text-sm transition-colors cursor-pointer ${
+              className={`w-full px-3 py-2.5 text-left text-sm transition-all cursor-pointer bg-popover ${
                 option.value === value
-                  ? 'bg-slate-100 text-slate-900 font-medium'
-                  : 'text-slate-700 hover:bg-slate-50'
+                  ? '!bg-primary/10 text-popover-foreground font-semibold border-l-2 border-primary'
+                  : 'text-muted-foreground hover:bg-secondary hover:text-popover-foreground hover:pl-4'
               }`}
             >
               {option.label}
@@ -115,7 +116,7 @@ export function Dropdown({
       )}
 
       {error && <p className="text-xs text-red-600 mt-1.5">{error}</p>}
-      {helperText && !error && <p className="text-xs text-slate-500 mt-1.5">{helperText}</p>}
+      {helperText && !error && <p className="text-xs text-muted-foreground mt-1.5">{helperText}</p>}
     </div>
   )
 }
