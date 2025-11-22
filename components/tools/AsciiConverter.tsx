@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   imageToAscii,
   loadImageData,
@@ -24,6 +24,7 @@ export default function AsciiConverter() {
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const asciiContainerRef = useRef<HTMLDivElement>(null)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -53,8 +54,24 @@ export default function AsciiConverter() {
     const options: AsciiOptions = { width, characterSet, invert }
     const ascii = imageToAscii(imageData, options)
     setAsciiArt(ascii)
-    setFontSize(calculateFontSize(ascii))
+
+    // Calculate font size based on container width (default to 600 for desktop, but will recalc on resize)
+    const containerWidth = asciiContainerRef.current?.clientWidth || 600
+    setFontSize(calculateFontSize(ascii, containerWidth))
   }
+
+  // Recalculate font size on window resize
+  useEffect(() => {
+    if (!asciiArt) return
+
+    const handleResize = () => {
+      const containerWidth = asciiContainerRef.current?.clientWidth || 600
+      setFontSize(calculateFontSize(asciiArt, containerWidth))
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [asciiArt])
 
   const handleCopyToClipboard = async () => {
     try {
@@ -254,7 +271,10 @@ export default function AsciiConverter() {
           {/* ASCII Output */}
           <div>
             <h2 className="text-lg font-semibold text-slate-900 mb-3">ASCII Art</h2>
-            <div className="bg-white border border-slate-200 rounded-lg overflow-auto aspect-square">
+            <div
+              ref={asciiContainerRef}
+              className="bg-white border border-slate-200 rounded-lg overflow-auto aspect-square"
+            >
               {asciiArt ? (
                 <pre
                   style={{ fontSize: `${fontSize}px` }}

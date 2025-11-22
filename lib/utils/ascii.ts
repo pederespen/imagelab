@@ -298,8 +298,9 @@ export function imageToAscii(imageData: ImageData, options: AsciiOptions): strin
 
   const chars = CHARACTER_SETS[characterSet] as string
 
-  // Apply contrast enhancement for better results
-  const processedData = enhanceContrast(imageData)
+  // Apply light smoothing to reduce texture noise, then enhance contrast
+  const smoothed = gaussianBlur(imageData, 1)
+  const processedData = enhanceContrast(smoothed)
 
   // Calculate height maintaining aspect ratio
   const aspectRatio = processedData.height / processedData.width
@@ -347,20 +348,19 @@ export function imageToAscii(imageData: ImageData, options: AsciiOptions): strin
 
 /**
  * Calculate optimal font size based on ASCII art dimensions
+ * Scales inversely with width so smaller character counts appear larger
  */
-export function calculateFontSize(asciiText: string): number {
+export function calculateFontSize(asciiText: string, containerWidth: number = 600): number {
   const lines = asciiText.split('\n').filter(line => line.length > 0)
   const maxLineLength = Math.max(...lines.map(line => line.length))
 
-  if (maxLineLength > 120) {
-    return Math.max(4, Math.floor((450 / maxLineLength) * 7))
-  } else if (maxLineLength > 80) {
-    return 6
-  } else if (maxLineLength > 60) {
-    return 7
-  } else {
-    return 8
-  }
+  // Calculate based on container width with padding consideration
+  // Subtract ~32px for padding (16px on each side)
+  const availableWidth = containerWidth - 32
+  const baseFontSize = (availableWidth / maxLineLength) * 1.5 // 1.5x multiplier for larger display
+
+  // Clamp between reasonable bounds (4px min for very wide, 30px max for narrow)
+  return Math.max(4, Math.min(30, Math.floor(baseFontSize)))
 }
 
 /**
