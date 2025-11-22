@@ -196,7 +196,7 @@ export default function AsciiConverter() {
             <div className="mb-6">
               <label className="block text-sm font-medium text-slate-700 mb-2">Invert Colors</label>
               <Button
-                variant={invert ? 'primary' : 'ghost'}
+                variant={invert ? 'primary' : 'secondary'}
                 fullWidth
                 onClick={() => setInvert(!invert)}
               >

@@ -71,7 +71,7 @@ export function Dropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full px-3 py-2.5 pr-9 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1 bg-white transition-all text-sm font-medium text-left relative ${
+        className={`w-full px-3 py-2.5 pr-9 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1 bg-white transition-all text-sm font-medium text-left relative cursor-pointer ${
           error ? 'border-red-400' : 'border-slate-200 hover:border-slate-300'
         }`}
       >
@@ -102,7 +102,7 @@ export function Dropdown({
               key={option.value}
               type="button"
               onClick={() => handleSelect(option.value)}
-              className={`w-full px-3 py-2.5 text-left text-sm transition-colors ${
+              className={`w-full px-3 py-2.5 text-left text-sm transition-colors cursor-pointer ${
                 option.value === value
                   ? 'bg-slate-100 text-slate-900 font-medium'
                   : 'text-slate-700 hover:bg-slate-50'

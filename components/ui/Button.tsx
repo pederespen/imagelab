@@ -29,7 +29,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const baseClasses =
       'font-medium rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1'
-    const disabledClasses = disabled ? 'opacity-40 cursor-not-allowed' : ''
+    const disabledClasses = disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
     const widthClass = fullWidth ? 'w-full' : ''
 
     const classes = [
