@@ -9,6 +9,7 @@ import {
   type CharacterSet,
   type AsciiOptions,
 } from '@/lib/utils/ascii'
+import { Button, Card, CardHeader, CardTitle, Dropdown, Slider } from '@/components/ui'
 
 export default function AsciiConverter() {
   const [imageData, setImageData] = useState<ImageData | null>(null)
@@ -147,96 +148,76 @@ export default function AsciiConverter() {
     <div className="w-full flex flex-col lg:flex-row gap-6">
       {/* Sidebar with Settings */}
       <div className="w-full lg:w-64 flex-shrink-0">
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 lg:p-6 lg:sticky lg:top-8">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">Settings</h3>
-
-          {/* Mobile: Grid layout, Desktop: Stacked */}
-          <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 lg:gap-0">
+        <Card className="lg:sticky lg:top-8">
+          <CardHeader>
+            <CardTitle>Settings</CardTitle>
+          </CardHeader>
+          <div className="px-4 pb-4 lg:px-6 lg:pb-6">
             {/* Width Slider */}
-            <div className="lg:mb-6">
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Width: {width} chars
-              </label>
-              <input
-                type="range"
-                min="20"
-                max="80"
+            <div className="mb-6">
+              <Slider
+                label={`Width: ${width} chars`}
+                min={20}
+                max={80}
                 value={width}
                 onChange={e => setWidth(Number(e.target.value))}
-                className="w-full"
               />
               <div className="flex flex-wrap gap-2 mt-2">
-                <button
-                  onClick={() => setWidth(30)}
-                  className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded"
-                >
+                <Button variant="ghost" size="sm" onClick={() => setWidth(30)}>
                   Twitch (30)
-                </button>
-                <button
-                  onClick={() => setWidth(40)}
-                  className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded"
-                >
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setWidth(40)}>
                   Discord (40)
-                </button>
-                <button
-                  onClick={() => setWidth(60)}
-                  className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded"
-                >
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setWidth(60)}>
                   Large (60)
-                </button>
+                </Button>
               </div>
             </div>
 
             {/* Character Set */}
-            <div className="lg:mb-6">
-              <label className="block text-sm font-medium text-slate-700 mb-2">Character Set</label>
-              <select
+            <div className="mb-6">
+              <Dropdown
+                label="Character Set"
                 value={characterSet}
-                onChange={e => setCharacterSet(e.target.value as CharacterSet)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="braille">Braille</option>
-                <option value="block">Block</option>
-                <option value="simple">Simple</option>
-                <option value="detailed">Detailed</option>
-                <option value="traditional">Traditional</option>
-              </select>
-              <p className="text-xs text-slate-500 mt-1">
-                Braille works best in Discord, Slack, Twitch
-              </p>
+                onChange={value => setCharacterSet(value as CharacterSet)}
+                options={[
+                  { value: 'braille', label: 'Braille' },
+                  { value: 'block', label: 'Block' },
+                  { value: 'simple', label: 'Simple' },
+                  { value: 'detailed', label: 'Detailed' },
+                  { value: 'traditional', label: 'Traditional' },
+                ]}
+                helperText="Braille works best in Discord, Slack, Twitch"
+              />
             </div>
 
             {/* Invert Toggle */}
-            <div className="lg:mb-6">
+            <div className="mb-6">
               <label className="block text-sm font-medium text-slate-700 mb-2">Invert Colors</label>
-              <button
+              <Button
+                variant={invert ? 'primary' : 'ghost'}
+                fullWidth
                 onClick={() => setInvert(!invert)}
-                className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
-                  invert
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                }`}
               >
                 {invert ? 'On' : 'Off'}
-              </button>
+              </Button>
             </div>
 
-            {/* Divider - hidden on mobile */}
-            <div className="hidden lg:block border-t border-slate-200 my-6"></div>
+            <div className="border-t border-slate-200 my-6"></div>
 
             {/* Upload Button */}
-            <div className="lg:mb-4">
-              <label className="block text-sm font-medium text-slate-700 mb-2 lg:hidden">
-                Upload
-              </label>
-              <button
+            <div className="mb-4">
+              <Button
+                variant="secondary"
+                size="lg"
+                fullWidth
                 onClick={handleUploadClick}
                 disabled={isProcessing}
-                className="w-full px-4 py-3 bg-slate-600 text-white rounded-md hover:bg-slate-700 transition-colors font-medium disabled:opacity-50"
               >
-                {isProcessing ? 'Loading...' : 'Upload'}
-              </button>
-              <p className="text-xs text-slate-500 mt-1 text-center">or paste image (Ctrl/Cmd+V)</p>
+                {isProcessing ? 'Loading...' : 'Upload Image'}
+              </Button>
+              <p className="text-xs text-slate-500 mt-2 text-center">or paste image (Ctrl/Cmd+V)</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -247,37 +228,33 @@ export default function AsciiConverter() {
             </div>
 
             {/* Convert Button */}
-            <div className="lg:mb-6">
-              <label className="block text-sm font-medium text-slate-700 mb-2 lg:hidden">
-                Generate
-              </label>
-              <button
+            <div className="mb-6">
+              <Button
+                variant="success"
+                size="lg"
+                fullWidth
                 onClick={handleConvert}
                 disabled={!imageData || isProcessing}
-                className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Convert
-              </button>
+                Convert to ASCII
+              </Button>
             </div>
-          </div>
 
-          {/* Action Buttons */}
-          {asciiArt && (
-            <>
-              <div className="border-t border-slate-200 my-4 lg:my-6"></div>
-              <button
-                onClick={handleCopyToClipboard}
-                className={`w-full px-4 py-2 rounded-md transition-colors text-sm font-medium ${
-                  copyStatus === 'copied'
-                    ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-blue-600 hover:bg-blue-700'
-                } text-white`}
-              >
-                {copyStatus === 'copied' ? 'Copied!' : 'Copy'}
-              </button>
-            </>
-          )}
-        </div>
+            {/* Action Buttons */}
+            {asciiArt && (
+              <>
+                <div className="border-t border-slate-200 my-6"></div>
+                <Button
+                  variant={copyStatus === 'copied' ? 'success' : 'primary'}
+                  fullWidth
+                  onClick={handleCopyToClipboard}
+                >
+                  {copyStatus === 'copied' ? 'Copied!' : 'Copy to Clipboard'}
+                </Button>
+              </>
+            )}
+          </div>
+        </Card>
       </div>
 
       {/* Main Content Area */}
