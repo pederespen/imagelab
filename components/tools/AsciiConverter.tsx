@@ -21,10 +21,44 @@ export default function AsciiConverter() {
   const [width, setWidth] = useState<number>(40)
   const [characterSet, setCharacterSet] = useState<CharacterSet>('braille')
   const [invert, setInvert] = useState<boolean>(false)
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle')
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const asciiContainerRef = useRef<HTMLDivElement>(null)
+
+  // Handle paste from clipboard
+  useEffect(() => {
+    const handlePaste = async (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items
+      if (!items) return
+
+      for (const item of items) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault()
+          const file = item.getAsFile()
+          if (!file) continue
+
+          setIsProcessing(true)
+          setAsciiArt('')
+          try {
+            const url = URL.createObjectURL(file)
+            setPreviewUrl(url)
+            const data = await loadImageData(file)
+            setImageData(data)
+          } catch (error) {
+            console.error('Error loading pasted image:', error)
+          } finally {
+            setIsProcessing(false)
+          }
+          break
+        }
+      }
+    }
+
+    window.addEventListener('paste', handlePaste)
+    return () => window.removeEventListener('paste', handlePaste)
+  }, [])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -79,15 +113,16 @@ export default function AsciiConverter() {
       const blob = new Blob([asciiArt], { type: 'text/plain;charset=utf-8' })
       const clipboardItem = new ClipboardItem({ 'text/plain': blob })
       await navigator.clipboard.write([clipboardItem])
-      alert('Copied to clipboard!')
+      setCopyStatus('copied')
+      setTimeout(() => setCopyStatus('idle'), 2000)
     } catch (error) {
       // Fallback to standard clipboard API
       try {
         await navigator.clipboard.writeText(asciiArt)
-        alert('Copied to clipboard!')
+        setCopyStatus('copied')
+        setTimeout(() => setCopyStatus('idle'), 2000)
       } catch (fallbackError) {
         console.error('Failed to copy:', fallbackError)
-        alert('Failed to copy to clipboard')
       }
     }
   }
@@ -130,18 +165,18 @@ export default function AsciiConverter() {
                 onChange={e => setWidth(Number(e.target.value))}
                 className="w-full"
               />
-              <div className="flex gap-2 mt-2">
+              <div className="flex flex-wrap gap-2 mt-2">
                 <button
                   onClick={() => setWidth(30)}
                   className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded"
                 >
-                  Small (30)
+                  Twitch (30)
                 </button>
                 <button
                   onClick={() => setWidth(40)}
                   className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded"
                 >
-                  Medium (40)
+                  Discord (40)
                 </button>
                 <button
                   onClick={() => setWidth(60)}
@@ -160,12 +195,15 @@ export default function AsciiConverter() {
                 onChange={e => setCharacterSet(e.target.value as CharacterSet)}
                 className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="block">Block</option>
                 <option value="braille">Braille</option>
+                <option value="block">Block</option>
                 <option value="simple">Simple</option>
                 <option value="detailed">Detailed</option>
                 <option value="traditional">Traditional</option>
               </select>
+              <p className="text-xs text-slate-500 mt-1">
+                Braille works best in Discord, Slack, Twitch
+              </p>
             </div>
 
             {/* Invert Toggle */}
@@ -198,6 +236,7 @@ export default function AsciiConverter() {
               >
                 {isProcessing ? 'Loading...' : 'Upload'}
               </button>
+              <p className="text-xs text-slate-500 mt-1 text-center">or paste image (Ctrl/Cmd+V)</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -226,20 +265,16 @@ export default function AsciiConverter() {
           {asciiArt && (
             <>
               <div className="border-t border-slate-200 my-4 lg:my-6"></div>
-              <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
-                <button
-                  onClick={handleCopyToClipboard}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
-                >
-                  Copy
-                </button>
-                <button
-                  onClick={handleDownload}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
-                >
-                  Download
-                </button>
-              </div>
+              <button
+                onClick={handleCopyToClipboard}
+                className={`w-full px-4 py-2 rounded-md transition-colors text-sm font-medium ${
+                  copyStatus === 'copied'
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                } text-white`}
+              >
+                {copyStatus === 'copied' ? 'Copied!' : 'Copy'}
+              </button>
             </>
           )}
         </div>
@@ -261,7 +296,6 @@ export default function AsciiConverter() {
                 />
               ) : (
                 <div className="text-center text-slate-400">
-                  <div className="text-6xl mb-2">📷</div>
                   <p>No image loaded</p>
                 </div>
               )}
@@ -277,43 +311,20 @@ export default function AsciiConverter() {
             >
               {asciiArt ? (
                 <pre
-                  style={{ fontSize: `${fontSize}px` }}
-                  className="font-mono leading-none p-4 whitespace-pre h-full"
+                  style={{ fontSize: `${fontSize}px`, lineHeight: '1.2' }}
+                  className="font-mono p-4 whitespace-pre h-full flex items-center justify-center"
                 >
                   {asciiArt}
                 </pre>
               ) : (
                 <div className="flex items-center justify-center h-full text-slate-400">
                   <div className="text-center">
-                    <div className="text-6xl mb-2">📝</div>
                     <p>ASCII art will appear here</p>
                   </div>
                 </div>
               )}
             </div>
           </div>
-        </div>
-
-        {/* Info Note */}
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-900 mb-2">
-            <strong>💡 For Chat Apps:</strong>
-          </p>
-          <ul className="text-sm text-blue-900 space-y-1 ml-4">
-            <li>
-              • <strong>Braille</strong> works best in Discord, Slack, Twitch
-            </li>
-            <li>
-              • <strong>Block</strong> is good for wider compatibility
-            </li>
-            <li>
-              • Keep width <strong>30-50 chars</strong> for mobile viewers
-            </li>
-            <li>
-              • Use code blocks in Discord:{' '}
-              <code className="bg-blue-100 px-1 rounded">```text</code>
-            </li>
-          </ul>
         </div>
       </div>
 
