@@ -1,8 +1,8 @@
 // Character sets for ASCII art conversion
 export const CHARACTER_SETS = {
-  simple: ' ░▒▓█',
+  simple: ' .:-=+*#%@',
   block: ' ░▒▓█',
-  braille: 'braille', // Special marker for braille mode
+  braille: 'braille',
   detailed: ' .·•○●◐◑◒◓◔◕◖◗◘◙◚◛◜◝◞◟',
   traditional: ' .,:;ilxXO#@',
 } as const
@@ -13,7 +13,6 @@ export interface AsciiOptions {
   width: number
   characterSet: CharacterSet
   invert: boolean
-  edgeDetection: boolean
 }
 
 /**
@@ -69,15 +68,89 @@ function enhanceContrast(imageData: ImageData): ImageData {
 }
 
 /**
- * Apply edge-enhanced processing to ImageData
- * Combines original brightness with edge detection for better detail
+ * Apply Gaussian blur for smoothing
  */
-function applyEdgeDetection(imageData: ImageData): ImageData {
+function gaussianBlur(imageData: ImageData, radius: number = 2): ImageData {
+  const output = new ImageData(imageData.width, imageData.height)
   const width = imageData.width
   const height = imageData.height
-  const output = new ImageData(width, height)
 
-  // Sobel kernels
+  // Gaussian kernel weights
+  const sigma = radius / 2
+  const kernel: number[] = []
+  let kernelSum = 0
+
+  for (let i = -radius; i <= radius; i++) {
+    const weight = Math.exp(-(i * i) / (2 * sigma * sigma))
+    kernel.push(weight)
+    kernelSum += weight
+  }
+
+  // Normalize kernel
+  for (let i = 0; i < kernel.length; i++) {
+    kernel[i] /= kernelSum
+  }
+
+  // Horizontal pass
+  const temp = new ImageData(width, height)
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let r = 0,
+        g = 0,
+        b = 0
+
+      for (let i = -radius; i <= radius; i++) {
+        const nx = Math.max(0, Math.min(width - 1, x + i))
+        const idx = (y * width + nx) * 4
+        const w = kernel[i + radius]
+        r += imageData.data[idx] * w
+        g += imageData.data[idx + 1] * w
+        b += imageData.data[idx + 2] * w
+      }
+
+      const outIdx = (y * width + x) * 4
+      temp.data[outIdx] = r
+      temp.data[outIdx + 1] = g
+      temp.data[outIdx + 2] = b
+      temp.data[outIdx + 3] = 255
+    }
+  }
+
+  // Vertical pass
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let r = 0,
+        g = 0,
+        b = 0
+
+      for (let i = -radius; i <= radius; i++) {
+        const ny = Math.max(0, Math.min(height - 1, y + i))
+        const idx = (ny * width + x) * 4
+        const w = kernel[i + radius]
+        r += temp.data[idx] * w
+        g += temp.data[idx + 1] * w
+        b += temp.data[idx + 2] * w
+      }
+
+      const outIdx = (y * width + x) * 4
+      output.data[outIdx] = r
+      output.data[outIdx + 1] = g
+      output.data[outIdx + 2] = b
+      output.data[outIdx + 3] = 255
+    }
+  }
+
+  return output
+}
+
+/**
+ * Detect edges using Sobel operator and return edge map
+ */
+function detectEdges(imageData: ImageData): Float32Array {
+  const width = imageData.width
+  const height = imageData.height
+  const edges = new Float32Array(width * height)
+
   const sobelX = [
     [-1, 0, 1],
     [-2, 0, 2],
@@ -89,16 +162,13 @@ function applyEdgeDetection(imageData: ImageData): ImageData {
     [1, 2, 1],
   ]
 
-  // Calculate edge magnitudes
-  const magnitudes: number[] = []
   let maxMagnitude = 0
 
   for (let y = 1; y < height - 1; y++) {
     for (let x = 1; x < width - 1; x++) {
-      let gx = 0
-      let gy = 0
+      let gx = 0,
+        gy = 0
 
-      // Apply Sobel kernels
       for (let ky = -1; ky <= 1; ky++) {
         for (let kx = -1; kx <= 1; kx++) {
           const idx = ((y + ky) * width + (x + kx)) * 4
@@ -110,39 +180,20 @@ function applyEdgeDetection(imageData: ImageData): ImageData {
         }
       }
 
-      // Calculate gradient magnitude
       const magnitude = Math.sqrt(gx * gx + gy * gy)
-      magnitudes.push(magnitude)
+      edges[y * width + x] = magnitude
       maxMagnitude = Math.max(maxMagnitude, magnitude)
     }
   }
 
-  // Combine edges with original brightness
-  let idx = 0
-  for (let y = 1; y < height - 1; y++) {
-    for (let x = 1; x < width - 1; x++) {
-      const pixelIdx = (y * width + x) * 4
-
-      // Get original brightness
-      const originalBrightness =
-        (imageData.data[pixelIdx] + imageData.data[pixelIdx + 1] + imageData.data[pixelIdx + 2]) / 3
-
-      // Normalize edge magnitude
-      const edgeStrength = (magnitudes[idx] / maxMagnitude) * 255
-
-      // Blend: 70% original brightness + 30% edges for definition
-      const blended = originalBrightness * 0.7 + edgeStrength * 0.3
-      const value = Math.min(255, blended)
-
-      output.data[pixelIdx] = value
-      output.data[pixelIdx + 1] = value
-      output.data[pixelIdx + 2] = value
-      output.data[pixelIdx + 3] = 255
-      idx++
+  // Normalize edges to 0-1 range
+  if (maxMagnitude > 0) {
+    for (let i = 0; i < edges.length; i++) {
+      edges[i] /= maxMagnitude
     }
   }
 
-  return output
+  return edges
 }
 
 /**
@@ -158,19 +209,28 @@ function imageToBraille(imageData: ImageData, width: number, invert: boolean): s
   // 6 7
   const BRAILLE_BASE = 0x2800
 
-  // Apply contrast enhancement
-  const processedData = enhanceContrast(imageData)
+  // Smooth image heavily to remove texture noise
+  const smoothed = gaussianBlur(imageData, 3)
+
+  // Enhance contrast after smoothing
+  const enhanced = enhanceContrast(smoothed)
+
+  // Detect edges
+  const edgeMap = detectEdges(enhanced)
+
+  // Edge threshold - only render dots where edges are strong
+  const edgeThreshold = 0.15
 
   // Calculate dimensions - Braille uses 2x4 pixel blocks
-  const aspectRatio = processedData.height / processedData.width
+  const aspectRatio = enhanced.height / enhanced.width
   const charWidth = width
   const charHeight = Math.floor(width * aspectRatio * 0.5)
 
   const pixelWidth = charWidth * 2
   const pixelHeight = charHeight * 4
 
-  const scaleX = processedData.width / pixelWidth
-  const scaleY = processedData.height / pixelHeight
+  const scaleX = enhanced.width / pixelWidth
+  const scaleY = enhanced.height / pixelHeight
 
   let braille = ''
 
@@ -194,18 +254,22 @@ function imageToBraille(imageData: ImageData, width: number, invert: boolean): s
         const px = Math.floor((cx * 2 + dotMap[i][0]) * scaleX)
         const py = Math.floor((cy * 4 + dotMap[i][1]) * scaleY)
 
-        if (px < processedData.width && py < processedData.height) {
-          const pixelIndex = (py * processedData.width + px) * 4
-          const r = processedData.data[pixelIndex]
-          const g = processedData.data[pixelIndex + 1]
-          const b = processedData.data[pixelIndex + 2]
+        if (px < enhanced.width && py < enhanced.height) {
+          const pixelIndex = (py * enhanced.width + px) * 4
+          const edgeIndex = py * enhanced.width + px
 
+          const r = enhanced.data[pixelIndex]
+          const g = enhanced.data[pixelIndex + 1]
+          const b = enhanced.data[pixelIndex + 2]
           const brightness = 0.299 * r + 0.587 * g + 0.114 * b
 
-          // Threshold: if bright enough, set the dot
-          const threshold = 127
-          const isDark = brightness < threshold
-          const shouldDot = invert ? !isDark : isDark
+          const edgeStrength = edgeMap[edgeIndex]
+
+          // Only place dots where there are strong edges OR very dark areas
+          const isEdge = edgeStrength > edgeThreshold
+          const isDark = brightness < 100
+
+          const shouldDot = invert ? isEdge || brightness > 200 : isEdge || isDark
 
           if (shouldDot) {
             bits |= 1 << i
@@ -225,7 +289,7 @@ function imageToBraille(imageData: ImageData, width: number, invert: boolean): s
  * Convert an image to ASCII art using specified character set
  */
 export function imageToAscii(imageData: ImageData, options: AsciiOptions): string {
-  const { width, characterSet, invert, edgeDetection } = options
+  const { width, characterSet, invert } = options
 
   // Handle Braille mode separately
   if (characterSet === 'braille') {
@@ -234,13 +298,8 @@ export function imageToAscii(imageData: ImageData, options: AsciiOptions): strin
 
   const chars = CHARACTER_SETS[characterSet] as string
 
-  // Always apply contrast enhancement for better results
-  let processedData = enhanceContrast(imageData)
-
-  // Apply edge enhancement if enabled
-  if (edgeDetection) {
-    processedData = applyEdgeDetection(processedData)
-  }
+  // Apply contrast enhancement for better results
+  const processedData = enhanceContrast(imageData)
 
   // Calculate height maintaining aspect ratio
   const aspectRatio = processedData.height / processedData.width

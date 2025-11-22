@@ -21,7 +21,6 @@ export default function AsciiConverter() {
   const [width, setWidth] = useState<number>(40)
   const [characterSet, setCharacterSet] = useState<CharacterSet>('braille')
   const [invert, setInvert] = useState<boolean>(false)
-  const [edgeDetection, setEdgeDetection] = useState<boolean>(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -51,7 +50,7 @@ export default function AsciiConverter() {
   const handleConvert = () => {
     if (!imageData) return
 
-    const options: AsciiOptions = { width, characterSet, invert, edgeDetection }
+    const options: AsciiOptions = { width, characterSet, invert }
     const ascii = imageToAscii(imageData, options)
     setAsciiArt(ascii)
     setFontSize(calculateFontSize(ascii))
@@ -100,9 +99,9 @@ export default function AsciiConverter() {
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Settings</h3>
 
           {/* Mobile: Grid layout, Desktop: Stacked */}
-          <div className="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-0">
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 lg:gap-0">
             {/* Width Slider */}
-            <div className="col-span-2 lg:mb-6">
+            <div className="lg:mb-6">
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Width: {width} chars
               </label>
@@ -137,7 +136,7 @@ export default function AsciiConverter() {
             </div>
 
             {/* Character Set */}
-            <div className="col-span-2 lg:mb-6">
+            <div className="lg:mb-6">
               <label className="block text-sm font-medium text-slate-700 mb-2">Character Set</label>
               <select
                 value={characterSet}
@@ -167,23 +166,8 @@ export default function AsciiConverter() {
               </button>
             </div>
 
-            {/* Edge Detection Toggle */}
-            <div className="lg:mb-6">
-              <label className="block text-sm font-medium text-slate-700 mb-2">Edge Enhance</label>
-              <button
-                onClick={() => setEdgeDetection(!edgeDetection)}
-                className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
-                  edgeDetection
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                }`}
-              >
-                {edgeDetection ? 'On' : 'Off'}
-              </button>
-            </div>
-
             {/* Divider - hidden on mobile */}
-            <div className="hidden lg:block border-t border-slate-200 my-6 col-span-2"></div>
+            <div className="hidden lg:block border-t border-slate-200 my-6"></div>
 
             {/* Upload Button */}
             <div className="lg:mb-4">
