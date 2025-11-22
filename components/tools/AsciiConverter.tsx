@@ -263,7 +263,6 @@ export default function AsciiConverter() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Original Image */}
           <div>
-            <h2 className="text-lg font-semibold text-slate-900 mb-3">Original</h2>
             <div className="bg-slate-100 rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-slate-200">
               {previewUrl ? (
                 <img
@@ -281,7 +280,6 @@ export default function AsciiConverter() {
 
           {/* ASCII Output */}
           <div>
-            <h2 className="text-lg font-semibold text-slate-900 mb-3">ASCII Art</h2>
             <div
               ref={asciiContainerRef}
               className="bg-white border border-slate-200 rounded-lg overflow-auto aspect-square"
