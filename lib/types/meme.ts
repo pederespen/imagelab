@@ -43,7 +43,7 @@ export const DEFAULT_TEXT_LAYER: Omit<TextLayer, 'id'> = {
   fontFamily: 'Impact',
   color: '#FFFFFF',
   strokeColor: '#000000',
-  strokeWidth: 3,
+  strokeWidth: 5,
   rotation: 0,
   textAlign: 'center',
   maxWidth: undefined,
@@ -79,9 +79,9 @@ export const MEME_TEMPLATES: MemeTemplate[] = [
     name: 'Distracted Boyfriend',
     imagePath: '/memes/distracted-boyfriend.jpg',
     defaultTexts: [
-      { x: 0.3, y: 0.15, fontSize: 28, text: 'text1', textAlign: 'center' },
-      { x: 0.5, y: 0.5, fontSize: 28, text: 'text2', textAlign: 'center' },
-      { x: 0.75, y: 0.15, fontSize: 28, text: 'text3', textAlign: 'center' },
+      { x: 0.279, y: 0.683, fontSize: 40, text: 'text1', textAlign: 'center' },
+      { x: 0.603, y: 0.519, fontSize: 41, text: 'text2', textAlign: 'center' },
+      { x: 0.842, y: 0.578, fontSize: 37, text: 'text3', textAlign: 'center' },
     ],
   },
   {
@@ -89,26 +89,26 @@ export const MEME_TEMPLATES: MemeTemplate[] = [
     name: 'Two Buttons',
     imagePath: '/memes/two-buttons.jpg',
     defaultTexts: [
-      { x: 0.25, y: 0.2, fontSize: 26, text: 'text1', textAlign: 'center' },
-      { x: 0.6, y: 0.2, fontSize: 26, text: 'text2', textAlign: 'center' },
-      { x: 0.5, y: 0.85, fontSize: 32, text: 'text3', textAlign: 'center' },
+      { x: 0.38, y: 0.162, fontSize: 26, text: 'text1', textAlign: 'center' },
+      { x: 0.546, y: 0.114, fontSize: 26, text: 'text2', textAlign: 'center' },
+      { x: 0.51, y: 0.896, fontSize: 32, text: 'text3', textAlign: 'center' },
     ],
   },
   {
     id: 'change-my-mind',
     name: 'Change My Mind',
     imagePath: '/memes/change-my-mind.jpg',
-    defaultTexts: [{ x: 0.45, y: 0.65, fontSize: 32, text: 'text1', textAlign: 'center' }],
+    defaultTexts: [{ x: 0.661, y: 0.679, fontSize: 52, text: 'text1', textAlign: 'center' }],
   },
   {
     id: 'expanding-brain',
     name: 'Expanding Brain',
     imagePath: '/memes/expanding-brain.jpg',
     defaultTexts: [
-      { x: 0.6, y: 0.13, fontSize: 28, text: 'text1', textAlign: 'center' },
-      { x: 0.6, y: 0.38, fontSize: 28, text: 'text2', textAlign: 'center' },
-      { x: 0.6, y: 0.63, fontSize: 28, text: 'text3', textAlign: 'center' },
-      { x: 0.6, y: 0.88, fontSize: 28, text: 'text4', textAlign: 'center' },
+      { x: 0.635, y: 0.19, fontSize: 28, text: 'text1', textAlign: 'center' },
+      { x: 0.639, y: 0.447, fontSize: 28, text: 'text2', textAlign: 'center' },
+      { x: 0.63, y: 0.685, fontSize: 28, text: 'text3', textAlign: 'center' },
+      { x: 0.632, y: 0.959, fontSize: 28, text: 'text4', textAlign: 'center' },
     ],
   },
   {
@@ -116,8 +116,8 @@ export const MEME_TEMPLATES: MemeTemplate[] = [
     name: 'Woman Yelling at Cat',
     imagePath: '/memes/woman-yelling-at-cat.jpg',
     defaultTexts: [
-      { x: 0.25, y: 0.15, fontSize: 32, text: 'text1', textAlign: 'center' },
-      { x: 0.75, y: 0.15, fontSize: 32, text: 'text2', textAlign: 'center' },
+      { x: 0.233, y: 0.181, fontSize: 47, text: 'text1', textAlign: 'center' },
+      { x: 0.751, y: 0.183, fontSize: 46, text: 'text2', textAlign: 'center' },
     ],
   },
   {
@@ -125,9 +125,9 @@ export const MEME_TEMPLATES: MemeTemplate[] = [
     name: 'Is This A Pigeon',
     imagePath: '/memes/is-this-a-pigeon.jpg',
     defaultTexts: [
-      { x: 0.35, y: 0.2, fontSize: 28, text: 'text1', textAlign: 'center' },
-      { x: 0.5, y: 0.45, fontSize: 28, text: 'text2', textAlign: 'center' },
-      { x: 0.5, y: 0.75, fontSize: 32, text: 'text3', textAlign: 'center' },
+      { x: 0.304, y: 0.318, fontSize: 28, text: 'text1', textAlign: 'center' },
+      { x: 0.802, y: 0.231, fontSize: 28, text: 'text2', textAlign: 'center' },
+      { x: 0.496, y: 0.952, fontSize: 32, text: 'text3', textAlign: 'center' },
     ],
   },
   {
@@ -135,9 +135,9 @@ export const MEME_TEMPLATES: MemeTemplate[] = [
     name: 'Running Away Balloon',
     imagePath: '/memes/running-away-balloon.jpg',
     defaultTexts: [
-      { x: 0.25, y: 0.15, fontSize: 28, text: 'text1', textAlign: 'center' },
-      { x: 0.5, y: 0.15, fontSize: 28, text: 'text2', textAlign: 'center' },
-      { x: 0.75, y: 0.35, fontSize: 28, text: 'text3', textAlign: 'center' },
+      { x: 0.312, y: 0.349, fontSize: 28, text: 'text1', textAlign: 'center' },
+      { x: 0.677, y: 0.21, fontSize: 28, text: 'text2', textAlign: 'center' },
+      { x: 0.292, y: 0.797, fontSize: 28, text: 'text3', textAlign: 'center' },
     ],
   },
   {
@@ -145,9 +145,9 @@ export const MEME_TEMPLATES: MemeTemplate[] = [
     name: 'Left Exit 12 Off Ramp',
     imagePath: '/memes/left-exit-12.jpg',
     defaultTexts: [
-      { x: 0.25, y: 0.35, fontSize: 26, text: 'text1', textAlign: 'center' },
-      { x: 0.65, y: 0.2, fontSize: 26, text: 'text2', textAlign: 'center' },
-      { x: 0.85, y: 0.65, fontSize: 26, text: 'text3', textAlign: 'center' },
+      { x: 0.351, y: 0.223, fontSize: 26, text: 'text1', textAlign: 'center' },
+      { x: 0.586, y: 0.229, fontSize: 26, text: 'text2', textAlign: 'center' },
+      { x: 0.521, y: 0.758, fontSize: 26, text: 'text3', textAlign: 'center' },
     ],
   },
   {
@@ -155,8 +155,8 @@ export const MEME_TEMPLATES: MemeTemplate[] = [
     name: 'Disaster Girl',
     imagePath: '/memes/disaster-girl.jpg',
     defaultTexts: [
-      { x: 0.5, y: 0.1, fontSize: 40, text: 'text1', textAlign: 'center' },
-      { x: 0.5, y: 0.9, fontSize: 40, text: 'text2', textAlign: 'center' },
+      { x: 0.298, y: 0.391, fontSize: 40, text: 'text1', textAlign: 'center' },
+      { x: 0.78, y: 0.4, fontSize: 40, text: 'text2', textAlign: 'center' },
     ],
   },
   {
@@ -164,8 +164,8 @@ export const MEME_TEMPLATES: MemeTemplate[] = [
     name: 'Hide the Pain Harold',
     imagePath: '/memes/hide-the-pain-harold.jpg',
     defaultTexts: [
-      { x: 0.5, y: 0.1, fontSize: 36, text: 'text1', textAlign: 'center' },
-      { x: 0.5, y: 0.9, fontSize: 36, text: 'text2', textAlign: 'center' },
+      { x: 0.622, y: 0.299, fontSize: 36, text: 'text1', textAlign: 'center' },
+      { x: 0.618, y: 0.82, fontSize: 36, text: 'text2', textAlign: 'center' },
     ],
   },
   {
@@ -181,27 +181,21 @@ export const MEME_TEMPLATES: MemeTemplate[] = [
     id: 'mocking-spongebob',
     name: 'Mocking Spongebob',
     imagePath: '/memes/mocking-spongebob.jpg',
-    defaultTexts: [
-      { x: 0.5, y: 0.1, fontSize: 36, text: 'text1', textAlign: 'center' },
-      { x: 0.5, y: 0.9, fontSize: 36, text: 'text2', textAlign: 'center' },
-    ],
+    defaultTexts: [{ x: 0.517, y: 0.893, fontSize: 36, text: 'text1', textAlign: 'center' }],
   },
   {
     id: 'scroll-of-truth',
     name: 'Scroll Of Truth',
     imagePath: '/memes/scroll-of-truth.jpg',
-    defaultTexts: [
-      { x: 0.5, y: 0.3, fontSize: 28, text: 'text1', textAlign: 'center' },
-      { x: 0.5, y: 0.75, fontSize: 32, text: 'text2', textAlign: 'center' },
-    ],
+    defaultTexts: [{ x: 0.327, y: 0.69, fontSize: 28, text: 'text1', textAlign: 'center' }],
   },
   {
     id: 'batman-slapping-robin',
     name: 'Batman Slapping Robin',
     imagePath: '/memes/batman-slapping-robin.jpg',
     defaultTexts: [
-      { x: 0.25, y: 0.15, fontSize: 28, text: 'text1', textAlign: 'center' },
-      { x: 0.75, y: 0.15, fontSize: 28, text: 'text2', textAlign: 'center' },
+      { x: 0.312, y: 0.097, fontSize: 28, text: 'text1', textAlign: 'center' },
+      { x: 0.708, y: 0.09, fontSize: 28, text: 'text2', textAlign: 'center' },
     ],
   },
   {
@@ -209,10 +203,10 @@ export const MEME_TEMPLATES: MemeTemplate[] = [
     name: 'Boardroom Meeting Suggestion',
     imagePath: '/memes/boardroom-meeting.jpg',
     defaultTexts: [
-      { x: 0.5, y: 0.15, fontSize: 26, text: 'text1', textAlign: 'center' },
-      { x: 0.25, y: 0.65, fontSize: 26, text: 'text2', textAlign: 'center' },
-      { x: 0.5, y: 0.65, fontSize: 26, text: 'text3', textAlign: 'center' },
-      { x: 0.75, y: 0.65, fontSize: 26, text: 'text4', textAlign: 'center' },
+      { x: 0.55, y: 0.047, fontSize: 26, text: 'text1', textAlign: 'center' },
+      { x: 0.299, y: 0.4, fontSize: 18, text: 'text2', textAlign: 'center' },
+      { x: 0.447, y: 0.417, fontSize: 21, text: 'text3', textAlign: 'center' },
+      { x: 0.634, y: 0.433, fontSize: 21, text: 'text4', textAlign: 'center' },
     ],
   },
   {
