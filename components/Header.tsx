@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import { useTheme } from './ThemeProvider'
 
@@ -13,6 +14,13 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2 group">
+            <Image
+              src={theme === 'dark' ? '/imagelab-logo-dark.png' : '/imagelab-logo-light.png'}
+              alt="ImageLab logo"
+              width={32}
+              height={32}
+              className="transition-opacity group-hover:opacity-80"
+            />
             <span className="text-xl font-bold text-foreground tracking-tight group-hover:text-muted-foreground transition-colors">
               ImageLab
             </span>
@@ -24,13 +32,13 @@ export default function Header() {
               href="/ascii"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              ASCII
+              Image to ASCII Converter
             </Link>
             <Link
               href="/meme"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              Meme
+              Meme Generator
             </Link>
 
             <button
@@ -167,14 +175,14 @@ export default function Header() {
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                ASCII
+                Image to ASCII Converter
               </Link>
               <Link
                 href="/meme"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Meme
+                Meme Generator
               </Link>
             </nav>
           </div>

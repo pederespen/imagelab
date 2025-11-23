@@ -5,13 +5,11 @@ const tools = [
     name: 'Image to ASCII',
     description: 'Convert images into ASCII art with customizable density',
     href: '/ascii',
-    icon: '📝',
   },
   {
     name: 'Meme Generator',
     description: 'Create memes with templates or your own images',
     href: '/meme',
-    icon: '😂',
   },
 ]
 
@@ -33,7 +31,6 @@ export default function Home() {
               href={tool.href}
               className="group bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-8 border border-card-border hover:border-border"
             >
-              <div className="text-5xl mb-4">{tool.icon}</div>
               <h2 className="text-2xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
                 {tool.name}
               </h2>
