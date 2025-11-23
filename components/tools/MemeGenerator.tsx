@@ -23,7 +23,6 @@ import {
   createCroppedCanvas,
 } from '@/lib/utils/meme'
 import { isGif, parseGifFrames, type GifFrame } from '@/lib/utils/gif'
-import GIF from 'gif.js.optimized'
 
 const CANVAS_WIDTH = 800
 const CANVAS_HEIGHT = 600
@@ -412,6 +411,9 @@ export default function MemeGenerator() {
     setGifProgress(0)
 
     try {
+      // Dynamic import to avoid SSR issues
+      const GIF = (await import('gif.js.optimized')).default
+
       // Calculate the image bounds for cropping
       const frame = gifFrames[0]
       const scale = Math.min(

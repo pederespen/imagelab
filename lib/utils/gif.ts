@@ -1,5 +1,4 @@
 import { parseGIF, decompressFrames } from 'gifuct-js'
-import GIF from 'gif.js.optimized'
 import { imageToAscii, type AsciiOptions } from './ascii'
 
 export interface GifFrame {
@@ -117,8 +116,11 @@ export async function generateAsciiGif(
   options: AsciiOptions,
   onProgress?: (progress: number) => void
 ): Promise<Blob> {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
+      // Dynamic import to avoid SSR issues
+      const GIF = (await import('gif.js.optimized')).default
+
       // Convert first frame to get dimensions
       const firstAscii = imageToAscii(frames[0].imageData, options)
       const lines = firstAscii.split('\n').filter(line => line.length > 0)
