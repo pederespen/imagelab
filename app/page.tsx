@@ -2,12 +2,6 @@ import Link from 'next/link'
 
 const tools = [
   {
-    name: 'Bauhaus Generator',
-    description: 'Create geometric art inspired by the Bauhaus movement',
-    href: '/bauhaus',
-    icon: '🎨',
-  },
-  {
     name: 'Image to ASCII',
     description: 'Convert images into ASCII art with customizable density',
     href: '/ascii',

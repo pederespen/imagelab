@@ -10,8 +10,6 @@ This document provides guidelines for AI-assisted development on this project.
 app/
 ├── layout.tsx              # Root layout
 ├── page.tsx                # Landing page
-├── bauhaus/
-│   └── page.tsx            # Bauhaus generator tool
 ├── ascii/
 │   └── page.tsx            # ASCII converter tool
 └── meme/
@@ -53,7 +51,7 @@ lib/
 
 ### Naming Conventions
 
-- **Components**: PascalCase (`BauhausCanvas.tsx`)
+- **Components**: PascalCase (`AsciiConverter.tsx`)
 - **Functions/variables**: camelCase (`generateArtwork`)
 - **Constants**: UPPER_SNAKE_CASE (`MAX_CANVAS_SIZE`)
 - **Types/Interfaces**: PascalCase, prefix interfaces with `I` if ambiguous (`ToolConfig`)
@@ -95,12 +93,6 @@ lib/
 - Optimize canvas rendering (requestAnimationFrame, offscreen canvas for heavy operations)
 
 ## Tool-Specific Guidelines
-
-### Bauhaus Generator
-
-- Parameterize: colors, shapes, grid size, randomness
-- Provide preset styles but allow customization
-- Download as PNG with transparent background option
 
 ### ASCII Converter
 

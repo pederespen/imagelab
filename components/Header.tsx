@@ -21,12 +21,6 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             <Link
-              href="/bauhaus"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Bauhaus
-            </Link>
-            <Link
               href="/ascii"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
@@ -168,13 +162,6 @@ export default function Header() {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-card-border/60">
             <nav className="flex flex-col space-y-3">
-              <Link
-                href="/bauhaus"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Bauhaus
-              </Link>
               <Link
                 href="/ascii"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"

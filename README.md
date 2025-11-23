@@ -4,7 +4,6 @@ A collection of creative image manipulation tools built with Next.js, TypeScript
 
 ## Tools
 
-- **Bauhaus Generator**: Create geometric art inspired by the Bauhaus movement
 - **Image to ASCII**: Convert images into ASCII art with customizable density
 - **Meme Generator**: Create memes with templates or your own images
 
