@@ -17,18 +17,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
         <input
           ref={ref}
           type="range"
-          className={`w-full h-2.5 rounded-full appearance-none cursor-pointer accent-primary shadow-sm ${className}`}
-          style={{
-            background: `linear-gradient(to right, rgb(var(--primary)) 0%, rgb(var(--primary)) ${
-              ((Number(props.value) - Number(props.min || 0)) /
-                (Number(props.max || 100) - Number(props.min || 0))) *
-              100
-            }%, rgb(var(--muted)) ${
-              ((Number(props.value) - Number(props.min || 0)) /
-                (Number(props.max || 100) - Number(props.min || 0))) *
-              100
-            }%, rgb(var(--muted)) 100%)`,
-          }}
+          className={`w-full h-2 bg-muted rounded-full appearance-none cursor-pointer accent-primary ${className}`}
           {...props}
         />
         {helperText && <p className="text-xs text-muted-foreground mt-1.5">{helperText}</p>}

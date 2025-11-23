@@ -15,6 +15,7 @@ interface DropdownProps {
   helperText?: string
   error?: string
   className?: string
+  size?: 'sm' | 'md'
 }
 
 export function Dropdown({
@@ -25,6 +26,7 @@ export function Dropdown({
   helperText,
   error,
   className = '',
+  size = 'md',
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -71,9 +73,9 @@ export function Dropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full px-3 py-2.5 pr-9 border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 bg-card text-foreground transition-all text-sm font-medium text-left relative cursor-pointer ${
-          error ? 'border-red-400' : 'border-input hover:border-border'
-        }`}
+        className={`w-full pr-9 border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 bg-card text-foreground transition-all text-sm font-medium text-left relative cursor-pointer ${
+          size === 'sm' ? 'px-3 py-1.5 text-xs' : 'px-3 py-2.5'
+        } ${error ? 'border-red-400' : 'border-input hover:border-border'}`}
       >
         <span className="block truncate">{selectedOption?.label || 'Select...'}</span>
         <span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">

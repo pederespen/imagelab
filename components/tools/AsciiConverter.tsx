@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { Upload, Copy, Check } from 'lucide-react'
 import {
   imageToAscii,
   loadImageData,
@@ -20,6 +21,7 @@ export default function AsciiConverter() {
 
   // Settings
   const [width, setWidth] = useState<number>(40)
+  const [debouncedWidth, setDebouncedWidth] = useState<number>(40)
   const [characterSet, setCharacterSet] = useState<CharacterSet>('braille')
   const [invert, setInvert] = useState<boolean>(false)
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle')
@@ -27,6 +29,15 @@ export default function AsciiConverter() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const asciiContainerRef = useRef<HTMLDivElement>(null)
+
+  // Debounce width changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedWidth(width)
+    }, 150)
+
+    return () => clearTimeout(timer)
+  }, [width])
 
   // Handle paste from clipboard
   useEffect(() => {
@@ -95,6 +106,13 @@ export default function AsciiConverter() {
     setFontSize(calculateFontSize(ascii, containerWidth))
   }
 
+  // Auto-convert when settings change or image loads
+  useEffect(() => {
+    if (imageData) {
+      handleConvert()
+    }
+  }, [imageData, debouncedWidth, characterSet, invert])
+
   // Recalculate font size on window resize
   useEffect(() => {
     if (!asciiArt) return
@@ -145,83 +163,22 @@ export default function AsciiConverter() {
   }
 
   return (
-    <div className="w-full flex flex-col lg:flex-row gap-6">
-      {/* Sidebar with Settings */}
-      <div className="w-full lg:w-64 flex-shrink-0">
-        <Card className="lg:sticky lg:top-8">
-          <CardHeader>
-            <CardTitle>Settings</CardTitle>
-          </CardHeader>
-          <div className="px-4 pb-4 lg:px-6 lg:pb-6">
-            {/* Width Slider */}
-            <div className="mb-6">
-              <Slider
-                label={`Width: ${width} chars`}
-                min={20}
-                max={80}
-                value={width}
-                onChange={e => setWidth(Number(e.target.value))}
-              />
-              <div className="flex flex-wrap gap-2 mt-2">
-                <Button variant="ghost" size="sm" onClick={() => setWidth(30)}>
-                  Twitch (30)
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => setWidth(40)}>
-                  Discord (40)
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => setWidth(60)}>
-                  Large (60)
-                </Button>
-              </div>
-            </div>
-
-            {/* Character Set */}
-            <div className="mb-6">
-              <Dropdown
-                label="Character Set"
-                value={characterSet}
-                onChange={value => setCharacterSet(value as CharacterSet)}
-                options={[
-                  { value: 'braille', label: 'Braille' },
-                  { value: 'block', label: 'Block' },
-                  { value: 'simple', label: 'Simple' },
-                  { value: 'detailed', label: 'Detailed' },
-                  { value: 'traditional', label: 'Traditional' },
-                ]}
-                helperText="Braille works best in Discord, Slack, Twitch"
-              />
-            </div>
-
-            {/* Invert Toggle */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
-                Invert Colors
-              </label>
+    <div className="w-full h-full flex flex-col gap-4">
+      {/* Controls Bar */}
+      <div className="flex-shrink-0">
+        <Card>
+          <div className="p-3">
+            <div className="flex flex-wrap items-center gap-3">
               <Button
-                variant={invert ? 'primary' : 'secondary'}
-                fullWidth
-                onClick={() => setInvert(!invert)}
-              >
-                {invert ? 'On' : 'Off'}
-              </Button>
-            </div>
-
-            <div className="border-t border-border my-6"></div>
-
-            {/* Upload Button */}
-            <div className="mb-4">
-              <Button
-                variant="secondary"
-                size="lg"
-                fullWidth
+                variant="primary"
+                size="sm"
                 onClick={handleUploadClick}
                 disabled={isProcessing}
+                className="inline-flex items-center"
               >
-                {isProcessing ? 'Loading...' : 'Upload Image'}
+                <Upload className="w-3.5 h-3.5 mr-1.5" />
+                {isProcessing ? 'Loading...' : 'Upload'}
               </Button>
-              <p className="text-xs text-muted-foreground mt-2 text-center">
-                or paste image (Ctrl/Cmd+V)
-              </p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -229,80 +186,139 @@ export default function AsciiConverter() {
                 onChange={handleFileChange}
                 className="hidden"
               />
-            </div>
 
-            {/* Convert Button */}
-            <div className="mb-6">
-              <Button
-                variant="success"
-                size="lg"
-                fullWidth
-                onClick={handleConvert}
-                disabled={!imageData || isProcessing}
-              >
-                Convert to ASCII
-              </Button>
-            </div>
+              {imageData && (
+                <>
+                  <div className="h-6 w-px bg-border" />
 
-            {/* Action Buttons */}
-            {asciiArt && (
-              <>
-                <div className="border-t border-border my-6"></div>
-                <Button
-                  variant={copyStatus === 'copied' ? 'success' : 'primary'}
-                  fullWidth
-                  onClick={handleCopyToClipboard}
-                >
-                  {copyStatus === 'copied' ? 'Copied!' : 'Copy to Clipboard'}
-                </Button>
-              </>
-            )}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs text-muted-foreground">Width:</span>
+                    <div className="flex gap-1">
+                      <Button
+                        variant={width === 30 ? 'primary' : 'ghost'}
+                        size="sm"
+                        onClick={() => setWidth(30)}
+                      >
+                        30
+                      </Button>
+                      <Button
+                        variant={width === 40 ? 'primary' : 'ghost'}
+                        size="sm"
+                        onClick={() => setWidth(40)}
+                      >
+                        40
+                      </Button>
+                      <Button
+                        variant={width === 60 ? 'primary' : 'ghost'}
+                        size="sm"
+                        onClick={() => setWidth(60)}
+                      >
+                        60
+                      </Button>
+                    </div>
+
+                    <div className="flex-1 min-w-32 max-w-48">
+                      <Slider
+                        min={20}
+                        max={80}
+                        value={width}
+                        onChange={e => setWidth(Number(e.target.value))}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-px bg-border" />
+
+                  <div className="w-32">
+                    <Dropdown
+                      value={characterSet}
+                      onChange={value => setCharacterSet(value as CharacterSet)}
+                      size="sm"
+                      options={[
+                        { value: 'braille', label: 'Braille' },
+                        { value: 'block', label: 'Block' },
+                        { value: 'simple', label: 'Simple' },
+                        { value: 'detailed', label: 'Detailed' },
+                        { value: 'traditional', label: 'Traditional' },
+                      ]}
+                    />
+                  </div>
+
+                  <Button
+                    variant={invert ? 'primary' : 'ghost'}
+                    size="sm"
+                    onClick={() => setInvert(!invert)}
+                  >
+                    {invert ? 'Inverted' : 'Normal'}
+                  </Button>
+                </>
+              )}
+
+              {asciiArt && (
+                <>
+                  <div className="flex-1" />
+                  <Button
+                    variant={copyStatus === 'copied' ? 'success' : 'secondary'}
+                    size="sm"
+                    onClick={handleCopyToClipboard}
+                    className="inline-flex items-center"
+                  >
+                    {copyStatus === 'copied' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 mr-1.5" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 mr-1.5" />
+                        Copy
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </Card>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 min-w-0">
-        {/* Two Column Layout - Stack on mobile */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Original Image */}
-          <div>
-            <div className="bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-border">
-              {previewUrl ? (
-                <img
-                  src={previewUrl}
-                  alt="Original"
-                  className="max-w-full max-h-full object-contain"
-                />
-              ) : (
-                <div className="text-center text-muted-foreground">
-                  <p>No image loaded</p>
-                </div>
-              )}
-            </div>
+      {/* Image and Output Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
+        {/* Original Image */}
+        <div className="flex flex-col gap-2 min-h-0">
+          <div className="bg-muted rounded-lg overflow-hidden flex-1 flex items-center justify-center border border-border min-h-[400px]">
+            {previewUrl ? (
+              <img
+                src={previewUrl}
+                alt="Original"
+                className="max-w-full max-h-full object-contain"
+              />
+            ) : (
+              <div className="text-center text-muted-foreground">
+                <p className="text-sm">No image loaded</p>
+              </div>
+            )}
           </div>
+        </div>
 
-          {/* ASCII Output */}
-          <div>
-            <div
-              ref={asciiContainerRef}
-              className="bg-card border border-border rounded-lg overflow-auto aspect-square"
-            >
-              {asciiArt ? (
-                <pre
-                  style={{ fontSize: `${fontSize}px`, lineHeight: '1.2' }}
-                  className="font-mono p-4 whitespace-pre h-full flex items-center justify-center text-foreground"
-                >
-                  {asciiArt}
-                </pre>
-              ) : (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                  <div className="text-center">
-                    <p>ASCII art will appear here</p>
-                  </div>
-                </div>
-              )}
-            </div>
+        {/* ASCII Output */}
+        <div className="flex flex-col gap-2 min-h-0">
+          <div
+            ref={asciiContainerRef}
+            className="bg-card border border-border rounded-lg overflow-auto flex-1 min-h-[400px]"
+          >
+            {asciiArt ? (
+              <pre
+                style={{ fontSize: `${fontSize}px`, lineHeight: '1.2' }}
+                className="font-mono p-4 whitespace-pre h-full flex items-center justify-center text-foreground"
+              >
+                {asciiArt}
+              </pre>
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                <p className="text-sm">ASCII art will appear here</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
