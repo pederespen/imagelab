@@ -219,4 +219,49 @@ export const MEME_TEMPLATES: MemeTemplate[] = [
       { x: 0.5, y: 0.85, fontSize: 30, text: 'text3', textAlign: 'center' },
     ],
   },
+  {
+    id: 'one-does-not-simply',
+    name: 'One Does Not Simply',
+    imagePath: '/memes/one-does-not-simply.jpg',
+    defaultTexts: [
+      { x: 0.5, y: 0.163, fontSize: 36, text: 'ONE DOES NOT SIMPLY', textAlign: 'center' },
+      { x: 0.515, y: 0.833, fontSize: 36, text: 'text2', textAlign: 'center' },
+    ],
+  },
+  {
+    id: 'this-is-fine',
+    name: 'This Is Fine',
+    imagePath: '/memes/this-is-fine.jpg',
+    defaultTexts: [
+      { x: 0.238, y: 0.746, fontSize: 32, text: 'text1', textAlign: 'center' },
+      { x: 0.756, y: 0.746, fontSize: 32, text: 'text2', textAlign: 'center' },
+    ],
+  },
+  {
+    id: 'trade-offer',
+    name: 'Trade Offer',
+    imagePath: '/memes/trade-offer.jpg',
+    defaultTexts: [
+      { x: 0.333, y: 0.294, fontSize: 28, text: 'text1', textAlign: 'center' },
+      { x: 0.628, y: 0.292, fontSize: 28, text: 'text2', textAlign: 'center' },
+    ],
+  },
+  {
+    id: 'uno-draw-25',
+    name: 'UNO Draw 25',
+    imagePath: '/memes/uno-draw-25.jpg',
+    defaultTexts: [
+      { x: 0.355, y: 0.334, fontSize: 39, text: 'text1', textAlign: 'center' },
+      { x: 0.67, y: 0.074, fontSize: 26, text: 'text2', textAlign: 'center' },
+    ],
+  },
+  {
+    id: 'who-would-win',
+    name: 'Who Would Win',
+    imagePath: '/memes/who-would-win.jpg',
+    defaultTexts: [
+      { x: 0.251, y: 0.576, fontSize: 63, text: 'text1', textAlign: 'center' },
+      { x: 0.759, y: 0.576, fontSize: 59, text: 'text2', textAlign: 'center' },
+    ],
+  },
 ]
