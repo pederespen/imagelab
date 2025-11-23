@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import Image from 'next/image'
 import { ChevronDown, Upload } from 'lucide-react'
 import { MemeTemplate } from '@/lib/types/meme'
 
@@ -77,12 +76,11 @@ export default function MemeTemplatePicker({
                   </div>
                 ) : (
                   <>
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src={template.imagePath}
                       alt={template.name}
-                      fill
-                      sizes="(max-width: 768px) 25vw, (max-width: 1024px) 20vw, 15vw"
-                      className="object-cover"
+                      className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="absolute bottom-0 left-0 right-0 p-2">

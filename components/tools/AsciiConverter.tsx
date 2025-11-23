@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import Image from 'next/image'
 import { Upload, Copy, Check, Download } from 'lucide-react'
 import {
   imageToAscii,
@@ -348,24 +347,14 @@ export default function AsciiConverter() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
         {/* Original Image */}
         <div className="flex flex-col gap-2">
-          <div className="bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-border p-2 relative">
+          <div className="bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-border p-2">
             {previewUrl ? (
               isGifFile ? (
-                <Image
-                  src={previewUrl}
-                  alt="Original GIF"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-contain"
-                />
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={previewUrl} alt="Original GIF" className="w-full h-full object-contain" />
               ) : (
-                <Image
-                  src={previewUrl}
-                  alt="Original"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-contain"
-                />
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={previewUrl} alt="Original" className="w-full h-full object-contain" />
               )
             ) : (
               <div className="text-center text-muted-foreground">
