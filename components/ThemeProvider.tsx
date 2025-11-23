@@ -1,41 +1,34 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
+
+type Theme = 'light' | 'dark'
+
+interface ThemeContextType {
+  theme: Theme
+  toggleTheme: () => void
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>('light')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    // Check for saved theme preference or default to light
-    const savedTheme = localStorage.getItem('theme')
+    // Check for saved theme preference or default to system
+    const savedTheme = localStorage.getItem('theme') as Theme | null
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    const theme = savedTheme || systemTheme
+    const initialTheme = savedTheme || systemTheme
 
-    if (theme === 'dark') {
+    setTheme(initialTheme)
+
+    if (initialTheme === 'dark') {
       document.documentElement.classList.add('dark')
     } else {
       document.documentElement.classList.remove('dark')
     }
-  }, [])
-
-  // Prevent flash of unstyled content
-  if (!mounted) {
-    return <>{children}</>
-  }
-
-  return <>{children}</>
-}
-
-export function useTheme() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
-
-  useEffect(() => {
-    // Get initial theme
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    const initialTheme = savedTheme || systemTheme
-    setTheme(initialTheme)
   }, [])
 
   const toggleTheme = () => {
@@ -50,5 +43,19 @@ export function useTheme() {
     }
   }
 
-  return { theme, toggleTheme }
+  // Prevent flash of unstyled content
+  if (!mounted) {
+    return <>{children}</>
+  }
+
+  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>
+}
+
+export function useTheme() {
+  const context = useContext(ThemeContext)
+  if (context === undefined) {
+    // Return default values during SSR or before context is ready
+    return { theme: 'light' as Theme, toggleTheme: () => {} }
+  }
+  return context
 }

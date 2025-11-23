@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { Upload, Download, Copy, Check, Plus, Trash2, Save } from 'lucide-react'
 import { Button, Card, Input, Dropdown, Slider } from '@/components/ui'
+import MemeTemplatePicker from '@/components/ui/MemeTemplatePicker'
+import { useTheme } from '@/components/ThemeProvider'
 import {
   TextLayer,
   MemeTemplate,
@@ -28,6 +30,7 @@ const CANVAS_HEIGHT = 600
 export default function MemeGenerator() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { theme } = useTheme()
 
   const [baseImage, setBaseImage] = useState<HTMLImageElement | null>(null)
   const [textLayers, setTextLayers] = useState<TextLayer[]>([])
@@ -38,10 +41,39 @@ export default function MemeGenerator() {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<string>('custom')
 
+  // Handle keyboard input for selected text layer
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selectedLayerId || !selectedLayer) return
+
+      // Ignore if user is typing in an input/textarea
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+
+      // Handle backspace
+      if (e.key === 'Backspace') {
+        e.preventDefault()
+        updateSelectedLayer({ text: selectedLayer.text.slice(0, -1) })
+      }
+      // Handle regular character input
+      else if (e.key.length === 1) {
+        e.preventDefault()
+        updateSelectedLayer({ text: selectedLayer.text + e.key })
+      }
+      // Handle Enter for new line
+      else if (e.key === 'Enter') {
+        e.preventDefault()
+        updateSelectedLayer({ text: selectedLayer.text + '\n' })
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedLayerId, textLayers])
+
   // Redraw canvas whenever layers or image changes
   useEffect(() => {
     redrawCanvas()
-  }, [baseImage, textLayers, selectedLayerId])
+  }, [baseImage, textLayers, selectedLayerId, theme])
 
   const redrawCanvas = (forExport = false) => {
     const canvas = canvasRef.current
@@ -50,14 +82,11 @@ export default function MemeGenerator() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Clear canvas - use white for export, muted for preview
+    // Clear canvas - use white for export, theme-aware muted for preview
     if (forExport) {
       ctx.fillStyle = '#ffffff'
     } else {
-      const mutedColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-muted')
-        .trim()
-      ctx.fillStyle = mutedColor || '#f1f5f9'
+      ctx.fillStyle = theme === 'dark' ? '#262626' : '#f1f5f9'
     }
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -307,18 +336,8 @@ export default function MemeGenerator() {
     <div className="w-full h-full flex flex-col gap-4">
       {/* Top Controls */}
       <Card>
-        <div className="p-3">
+        <div className="p-2">
           <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isLoading}
-              className="inline-flex items-center justify-center"
-            >
-              <Upload className="w-3.5 h-3.5 mr-1.5" />
-              {isLoading ? 'Loading...' : 'Upload'}
-            </Button>
             <input
               ref={fileInputRef}
               type="file"
@@ -327,36 +346,31 @@ export default function MemeGenerator() {
               className="hidden"
             />
 
-            <div className="hidden sm:block h-6 w-px bg-border" />
+            <MemeTemplatePicker
+              templates={MEME_TEMPLATES}
+              selectedId={selectedTemplate}
+              onSelect={handleTemplateSelect}
+            />
 
-            <div className="w-full sm:w-48">
-              <Dropdown
-                value={selectedTemplate}
-                onChange={handleTemplateSelect}
-                size="sm"
-                options={MEME_TEMPLATES.map(t => ({
-                  value: t.id,
-                  label: t.name,
-                }))}
-              />
-            </div>
+            {baseImage && (
+              <>
+                <div className="hidden sm:block h-6 w-px bg-border" />
 
-            <div className="hidden sm:block h-6 w-px bg-border" />
-
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={addTextLayer}
-              disabled={!baseImage}
-              className="inline-flex items-center justify-center"
-            >
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
-              Add Text
-            </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={addTextLayer}
+                  className="inline-flex items-center justify-center"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1.5" />
+                  Add Text
+                </Button>
+              </>
+            )}
 
             {selectedLayerId && (
               <Button
-                variant="ghost"
+                variant="secondary"
                 size="sm"
                 onClick={deleteSelectedLayer}
                 className="inline-flex items-center justify-center"
@@ -369,15 +383,17 @@ export default function MemeGenerator() {
             {baseImage && (
               <>
                 <div className="hidden sm:block flex-1" />
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={handleSaveTemplate}
-                  className="inline-flex items-center justify-center"
-                >
-                  <Save className="w-3.5 h-3.5 mr-1.5" />
-                  Save Config
-                </Button>
+                {process.env.NODE_ENV === 'development' && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleSaveTemplate}
+                    className="inline-flex items-center justify-center"
+                  >
+                    <Save className="w-3.5 h-3.5 mr-1.5" />
+                    Save Config
+                  </Button>
+                )}
                 <Button
                   variant={copyStatus === 'copied' ? 'success' : 'secondary'}
                   size="sm"
@@ -415,7 +431,7 @@ export default function MemeGenerator() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
         {/* Canvas */}
         <div className="lg:col-span-2 flex flex-col gap-2 min-h-0">
-          <div className="bg-muted rounded-lg overflow-hidden flex-1 flex items-center justify-center border border-border min-h-[400px]">
+          <div className="bg-muted rounded-lg overflow-hidden flex-1 flex items-center justify-center border border-border min-h-[400px] relative">
             <canvas
               ref={canvasRef}
               width={CANVAS_WIDTH}
@@ -426,6 +442,13 @@ export default function MemeGenerator() {
               onMouseLeave={handleCanvasMouseUp}
               className="max-w-full max-h-full cursor-move"
             />
+            {!baseImage && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="text-center text-muted-foreground px-4">
+                  <p className="text-sm">Select a preset or upload your own image to get started</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -436,13 +459,6 @@ export default function MemeGenerator() {
               {selectedLayer ? (
                 <>
                   <h3 className="text-sm font-semibold text-foreground">Edit Text</h3>
-
-                  <Input
-                    label="Text"
-                    value={selectedLayer.text}
-                    onChange={e => updateSelectedLayer({ text: e.target.value })}
-                    placeholder="Enter your text"
-                  />
 
                   <div className="grid grid-cols-2 gap-3">
                     <Slider

@@ -210,16 +210,6 @@ export const MEME_TEMPLATES: MemeTemplate[] = [
     ],
   },
   {
-    id: 'they-are-the-same-picture',
-    name: "They're The Same Picture",
-    imagePath: '/memes/they-are-the-same-picture.jpg',
-    defaultTexts: [
-      { x: 0.3, y: 0.45, fontSize: 28, text: 'text1', textAlign: 'center' },
-      { x: 0.7, y: 0.45, fontSize: 28, text: 'text2', textAlign: 'center' },
-      { x: 0.5, y: 0.85, fontSize: 30, text: 'text3', textAlign: 'center' },
-    ],
-  },
-  {
     id: 'one-does-not-simply',
     name: 'One Does Not Simply',
     imagePath: '/memes/one-does-not-simply.jpg',

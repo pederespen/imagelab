@@ -48,22 +48,38 @@ export function drawTextLayer(
   // Draw selection box
   if (isSelected) {
     ctx.save()
-    ctx.strokeStyle = '#3b82f6'
-    ctx.lineWidth = 2
-    ctx.setLineDash([5, 5])
 
-    const metrics = ctx.measureText(layer.text)
-    const textWidth = metrics.width
-    const textHeight = layer.fontSize * 1.2
+    // Measure all lines to get proper dimensions
+    ctx.font = `${layer.fontSize}px ${layer.fontFamily}`
+    ctx.textAlign = layer.textAlign
+    ctx.textBaseline = 'middle'
+
+    const lines = layer.text.split('\n')
+    const lineHeight = layer.fontSize * 1.2
+    let maxWidth = 0
+
+    lines.forEach(line => {
+      const metrics = ctx.measureText(line)
+      maxWidth = Math.max(maxWidth, metrics.width)
+    })
+
+    const textWidth = maxWidth
+    const textHeight = lines.length * lineHeight
+
+    // Add stroke width to dimensions
+    const extraPadding = layer.strokeWidth
 
     ctx.translate(layer.x, layer.y)
     ctx.rotate((layer.rotation * Math.PI) / 180)
 
-    const padding = 10
+    const padding = 4 + extraPadding
     let x = -textWidth / 2 - padding
     if (layer.textAlign === 'left') x = -padding
     if (layer.textAlign === 'right') x = -textWidth - padding
 
+    ctx.strokeStyle = '#000000'
+    ctx.lineWidth = 2
+    ctx.setLineDash([5, 5])
     ctx.strokeRect(x, -textHeight / 2 - padding, textWidth + padding * 2, textHeight + padding * 2)
     ctx.restore()
   }
