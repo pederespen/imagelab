@@ -372,7 +372,10 @@ export default function AsciiConverter() {
             ) : (
               <div className="text-center text-muted-foreground">
                 <p className="text-sm">No image loaded</p>
-                <p className="text-xs mt-1">Upload or paste an image or GIF</p>
+                <p className="text-xs mt-1">Upload or paste an image</p>
+                <p className="text-xs mt-1 opacity-75">
+                  (GIFs must be uploaded to preserve animation)
+                </p>
               </div>
             )}
           </div>
@@ -382,7 +385,7 @@ export default function AsciiConverter() {
         <div className="flex flex-col gap-2">
           <div
             ref={asciiContainerRef}
-            className="bg-card border border-border rounded-lg overflow-auto aspect-square"
+            className="bg-muted border border-border rounded-lg overflow-auto aspect-square"
           >
             {asciiArt ? (
               <pre
