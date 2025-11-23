@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Upload, Copy, Check } from 'lucide-react'
+import { Upload, Copy, Check, Download } from 'lucide-react'
 import {
   imageToAscii,
   loadImageData,
@@ -10,6 +10,7 @@ import {
   type CharacterSet,
   type AsciiOptions,
 } from '@/lib/utils/ascii'
+import { isGif, parseGifFrames, generateAsciiGif, type GifFrame } from '@/lib/utils/gif'
 import { Button, Card, CardHeader, CardTitle, Dropdown, Slider } from '@/components/ui'
 
 export default function AsciiConverter() {
@@ -18,6 +19,13 @@ export default function AsciiConverter() {
   const [previewUrl, setPreviewUrl] = useState<string>('')
   const [fontSize, setFontSize] = useState<number>(8)
   const [isProcessing, setIsProcessing] = useState(false)
+
+  // GIF-specific state
+  const [isGifFile, setIsGifFile] = useState<boolean>(false)
+  const [gifFrames, setGifFrames] = useState<GifFrame[]>([])
+  const [currentFrameIndex, setCurrentFrameIndex] = useState<number>(0)
+  const [isGeneratingGif, setIsGeneratingGif] = useState<boolean>(false)
+  const [gifProgress, setGifProgress] = useState<number>(0)
 
   // Settings
   const [width, setWidth] = useState<number>(40)
@@ -51,18 +59,7 @@ export default function AsciiConverter() {
           const file = item.getAsFile()
           if (!file) continue
 
-          setIsProcessing(true)
-          setAsciiArt('')
-          try {
-            const url = URL.createObjectURL(file)
-            setPreviewUrl(url)
-            const data = await loadImageData(file)
-            setImageData(data)
-          } catch (error) {
-            console.error('Error loading pasted image:', error)
-          } finally {
-            setIsProcessing(false)
-          }
+          await handleFileLoad(file)
           break
         }
       }
@@ -72,20 +69,52 @@ export default function AsciiConverter() {
     return () => window.removeEventListener('paste', handlePaste)
   }, [])
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  // Animate GIF frames for ASCII preview
+  useEffect(() => {
+    if (!isGifFile || gifFrames.length === 0) return
 
+    let frameIndex = 0
+    let timeoutId: NodeJS.Timeout
+
+    const animate = () => {
+      setCurrentFrameIndex(frameIndex)
+      setImageData(gifFrames[frameIndex].imageData)
+
+      const delay = gifFrames[frameIndex].delay
+      frameIndex = (frameIndex + 1) % gifFrames.length
+
+      timeoutId = setTimeout(animate, delay)
+    }
+
+    animate()
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [isGifFile, gifFrames])
+
+  const handleFileLoad = async (file: File) => {
     setIsProcessing(true)
-    setAsciiArt('') // Clear previous ASCII art
+    setAsciiArt('')
+    setIsGifFile(false)
+    setGifFrames([])
+
     try {
-      // Create preview
+      // Create preview URL
       const url = URL.createObjectURL(file)
       setPreviewUrl(url)
 
-      // Load image data
-      const data = await loadImageData(file)
-      setImageData(data)
+      // Check if it's a GIF
+      if (isGif(file)) {
+        setIsGifFile(true)
+        const frames = await parseGifFrames(file)
+        setGifFrames(frames)
+        setImageData(frames[0].imageData)
+      } else {
+        // Load regular image
+        const data = await loadImageData(file)
+        setImageData(data)
+      }
     } catch (error) {
       console.error('Error loading image:', error)
       alert('Failed to load image. Please try another file.')
@@ -94,24 +123,30 @@ export default function AsciiConverter() {
     }
   }
 
-  const handleConvert = () => {
-    if (!imageData) return
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
 
-    const options: AsciiOptions = { width, characterSet, invert }
-    const ascii = imageToAscii(imageData, options)
-    setAsciiArt(ascii)
-
-    // Calculate font size based on container width (default to 600 for desktop, but will recalc on resize)
-    const containerWidth = asciiContainerRef.current?.clientWidth || 600
-    setFontSize(calculateFontSize(ascii, containerWidth))
+    await handleFileLoad(file)
   }
 
   // Auto-convert when settings change or image loads
   useEffect(() => {
     if (imageData) {
-      handleConvert()
+      const options: AsciiOptions = {
+        width: debouncedWidth,
+        characterSet,
+        invert,
+        disableAutoCrop: isGifFile, // Disable auto-crop for GIFs to maintain consistent size
+      }
+      const ascii = imageToAscii(imageData, options)
+      setAsciiArt(ascii)
+
+      // Calculate font size based on container width
+      const containerWidth = asciiContainerRef.current?.clientWidth || 600
+      setFontSize(calculateFontSize(ascii, containerWidth))
     }
-  }, [imageData, debouncedWidth, characterSet, invert])
+  }, [imageData, debouncedWidth, characterSet, invert, isGifFile])
 
   // Recalculate font size on window resize
   useEffect(() => {
@@ -156,6 +191,35 @@ export default function AsciiConverter() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+  }
+
+  const handleDownloadGif = async () => {
+    if (!isGifFile || gifFrames.length === 0) return
+
+    setIsGeneratingGif(true)
+    setGifProgress(0)
+
+    try {
+      const options: AsciiOptions = { width, characterSet, invert }
+      const blob = await generateAsciiGif(gifFrames, options, progress => {
+        setGifProgress(Math.floor(progress * 100))
+      })
+
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'ascii-art.gif'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error generating GIF:', error)
+      alert('Failed to generate GIF. Please try again.')
+    } finally {
+      setIsGeneratingGif(false)
+      setGifProgress(0)
+    }
   }
 
   const handleUploadClick = () => {
@@ -276,6 +340,18 @@ export default function AsciiConverter() {
                       </>
                     )}
                   </Button>
+                  {isGifFile && (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={handleDownloadGif}
+                      disabled={isGeneratingGif}
+                      className="inline-flex items-center justify-center w-full sm:w-auto"
+                    >
+                      <Download className="w-3.5 h-3.5 mr-1.5" />
+                      {isGeneratingGif ? `${gifProgress}%` : 'Download GIF'}
+                    </Button>
+                  )}
                 </>
               )}
             </div>
@@ -289,17 +365,34 @@ export default function AsciiConverter() {
         <div className="flex flex-col gap-2">
           <div className="bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-border">
             {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt="Original"
-                className="max-w-full max-h-full object-contain"
-              />
+              isGifFile ? (
+                <img
+                  src={previewUrl}
+                  alt="Original GIF"
+                  className="max-w-full max-h-full object-contain"
+                />
+              ) : (
+                <img
+                  src={previewUrl}
+                  alt="Original"
+                  className="max-w-full max-h-full object-contain"
+                />
+              )
             ) : (
               <div className="text-center text-muted-foreground">
                 <p className="text-sm">No image loaded</p>
+                <p className="text-xs mt-1">Upload or paste an image or GIF</p>
               </div>
             )}
           </div>
+          {isGifFile && gifFrames.length > 0 && (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <p className="text-xs text-muted-foreground">
+                Animated GIF • {gifFrames.length} frames
+              </p>
+            </div>
+          )}
         </div>
 
         {/* ASCII Output */}
@@ -321,6 +414,11 @@ export default function AsciiConverter() {
               </div>
             )}
           </div>
+          {isGifFile && gifFrames.length > 0 && asciiArt && (
+            <p className="text-xs text-muted-foreground text-center">
+              ASCII Animation • Frame {currentFrameIndex + 1}/{gifFrames.length}
+            </p>
+          )}
         </div>
       </div>
 
