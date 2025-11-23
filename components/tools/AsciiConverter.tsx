@@ -168,13 +168,13 @@ export default function AsciiConverter() {
       <div className="flex-shrink-0">
         <Card>
           <div className="p-3">
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
               <Button
                 variant="primary"
                 size="sm"
                 onClick={handleUploadClick}
                 disabled={isProcessing}
-                className="inline-flex items-center"
+                className="inline-flex items-center justify-center"
               >
                 <Upload className="w-3.5 h-3.5 mr-1.5" />
                 {isProcessing ? 'Loading...' : 'Upload'}
@@ -189,9 +189,9 @@ export default function AsciiConverter() {
 
               {imageData && (
                 <>
-                  <div className="h-6 w-px bg-border" />
+                  <div className="hidden sm:block h-6 w-px bg-border" />
 
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
                     <span className="text-xs text-muted-foreground">Width:</span>
                     <div className="flex gap-1">
                       <Button
@@ -217,7 +217,7 @@ export default function AsciiConverter() {
                       </Button>
                     </div>
 
-                    <div className="flex-1 min-w-32 max-w-48">
+                    <div className="flex-1 min-w-32 w-full sm:w-auto sm:max-w-48">
                       <Slider
                         min={20}
                         max={80}
@@ -227,9 +227,9 @@ export default function AsciiConverter() {
                     </div>
                   </div>
 
-                  <div className="h-6 w-px bg-border" />
+                  <div className="hidden sm:block h-6 w-px bg-border" />
 
-                  <div className="w-32">
+                  <div className="w-full sm:w-32">
                     <Dropdown
                       value={characterSet}
                       onChange={value => setCharacterSet(value as CharacterSet)}
@@ -248,6 +248,7 @@ export default function AsciiConverter() {
                     variant={invert ? 'primary' : 'ghost'}
                     size="sm"
                     onClick={() => setInvert(!invert)}
+                    className="w-full sm:w-auto"
                   >
                     {invert ? 'Inverted' : 'Normal'}
                   </Button>
@@ -256,12 +257,12 @@ export default function AsciiConverter() {
 
               {asciiArt && (
                 <>
-                  <div className="flex-1" />
+                  <div className="hidden sm:block flex-1" />
                   <Button
                     variant={copyStatus === 'copied' ? 'success' : 'secondary'}
                     size="sm"
                     onClick={handleCopyToClipboard}
-                    className="inline-flex items-center"
+                    className="inline-flex items-center justify-center w-full sm:w-auto"
                   >
                     {copyStatus === 'copied' ? (
                       <>
