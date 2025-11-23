@@ -16,73 +16,6 @@ export interface AsciiOptions {
 }
 
 /**
- * Auto-crop whitespace from ImageData
- * Detects and removes white/light-colored borders
- */
-function autoCropWhitespace(imageData: ImageData, threshold: number = 240): ImageData {
-  const width = imageData.width
-  const height = imageData.height
-  const data = imageData.data
-
-  let minX = width
-  let minY = height
-  let maxX = 0
-  let maxY = 0
-
-  // Find bounding box of non-white content
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const idx = (y * width + x) * 4
-      const r = data[idx]
-      const g = data[idx + 1]
-      const b = data[idx + 2]
-      const brightness = (r + g + b) / 3
-
-      // If pixel is not white/bright
-      if (brightness < threshold) {
-        minX = Math.min(minX, x)
-        minY = Math.min(minY, y)
-        maxX = Math.max(maxX, x)
-        maxY = Math.max(maxY, y)
-      }
-    }
-  }
-
-  // If no content found, return original
-  if (minX >= maxX || minY >= maxY) {
-    return imageData
-  }
-
-  // Add small padding (2% of dimensions)
-  const paddingX = Math.max(2, Math.floor((maxX - minX) * 0.02))
-  const paddingY = Math.max(2, Math.floor((maxY - minY) * 0.02))
-
-  minX = Math.max(0, minX - paddingX)
-  minY = Math.max(0, minY - paddingY)
-  maxX = Math.min(width - 1, maxX + paddingX)
-  maxY = Math.min(height - 1, maxY + paddingY)
-
-  // Create cropped image
-  const croppedWidth = maxX - minX + 1
-  const croppedHeight = maxY - minY + 1
-  const cropped = new ImageData(croppedWidth, croppedHeight)
-
-  for (let y = 0; y < croppedHeight; y++) {
-    for (let x = 0; x < croppedWidth; x++) {
-      const srcIdx = ((minY + y) * width + (minX + x)) * 4
-      const dstIdx = (y * croppedWidth + x) * 4
-
-      cropped.data[dstIdx] = data[srcIdx]
-      cropped.data[dstIdx + 1] = data[srcIdx + 1]
-      cropped.data[dstIdx + 2] = data[srcIdx + 2]
-      cropped.data[dstIdx + 3] = data[srcIdx + 3]
-    }
-  }
-
-  return cropped
-}
-
-/**
  * Apply contrast enhancement to ImageData
  */
 function enhanceContrast(imageData: ImageData): ImageData {
@@ -465,7 +398,7 @@ export function loadImageData(file: File): Promise<ImageData> {
         resolve(imageData)
       }
 
-      img.onerror = error => {
+      img.onerror = _error => {
         reject(new Error('Failed to load image'))
       }
 

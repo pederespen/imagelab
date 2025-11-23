@@ -1,13 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Upload, Download, Copy, Check, Plus, Trash2, Save } from 'lucide-react'
-import { Button, Card, Input, Dropdown, Slider } from '@/components/ui'
+import { Download, Copy, Check, Plus, Trash2, Save } from 'lucide-react'
+import { Button, Card, Dropdown, Slider } from '@/components/ui'
 import MemeTemplatePicker from '@/components/ui/MemeTemplatePicker'
 import { useTheme } from '@/components/ThemeProvider'
 import {
   TextLayer,
-  MemeTemplate,
   MEME_TEMPLATES,
   DEFAULT_TEXT_LAYER,
   FONT_OPTIONS,
@@ -37,19 +36,16 @@ export default function MemeGenerator() {
   const [baseImage, setBaseImage] = useState<HTMLImageElement | null>(null)
   const [textLayers, setTextLayers] = useState<TextLayer[]>([])
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null)
-  const [shouldReplaceText, setShouldReplaceText] = useState(false)
   const [editedLayerIds, setEditedLayerIds] = useState<Set<string>>(new Set())
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle')
-  const [isLoading, setIsLoading] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<string>('custom')
 
   // GIF-specific state
   const [isGifFile, setIsGifFile] = useState(false)
   const [gifFrames, setGifFrames] = useState<GifFrame[]>([])
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0)
-  const [gifPreviewUrl, setGifPreviewUrl] = useState<string>('')
   const [isGeneratingGif, setIsGeneratingGif] = useState(false)
   const [gifProgress, setGifProgress] = useState(0)
 
@@ -94,6 +90,7 @@ export default function MemeGenerator() {
 
     window.addEventListener('paste', handlePaste)
     return () => window.removeEventListener('paste', handlePaste)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Handle keyboard input for selected text layer
@@ -161,11 +158,13 @@ export default function MemeGenerator() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedLayerId, textLayers, editedLayerIds])
 
   // Redraw canvas whenever layers or image changes
   useEffect(() => {
     redrawCanvas()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [baseImage, textLayers, selectedLayerId, theme, currentFrameIndex, isGifFile, gifFrames])
 
   const redrawCanvas = (forExport = false) => {
@@ -225,7 +224,6 @@ export default function MemeGenerator() {
 
   const handleTemplateSelect = async (templateId: string) => {
     setSelectedTemplate(templateId)
-    setIsLoading(true)
 
     try {
       const template = MEME_TEMPLATES.find(t => t.id === templateId)
@@ -233,7 +231,6 @@ export default function MemeGenerator() {
 
       if (template.id === 'custom') {
         fileInputRef.current?.click()
-        setIsLoading(false)
         return
       }
 
@@ -247,7 +244,6 @@ export default function MemeGenerator() {
       // Clear GIF state when loading a preset template
       setIsGifFile(false)
       setGifFrames([])
-      setGifPreviewUrl('')
 
       // Convert relative positions to absolute canvas positions
       if (template.defaultTexts && template.defaultTexts.length > 0) {
@@ -266,14 +262,11 @@ export default function MemeGenerator() {
       } else {
         setTextLayers([])
         setSelectedLayerId(null)
-        setShouldReplaceText(false)
         setEditedLayerIds(new Set())
       }
     } catch (error) {
       console.error('Failed to load template:', error)
       alert('Failed to load template. Please try again.')
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -285,7 +278,6 @@ export default function MemeGenerator() {
   }
 
   const handleFileLoad = async (file: File) => {
-    setIsLoading(true)
     try {
       // Check if it's a GIF
       if (isGif(file)) {
@@ -293,7 +285,6 @@ export default function MemeGenerator() {
         const frames = await parseGifFrames(file)
         setGifFrames(frames)
         setIsGifFile(true)
-        setGifPreviewUrl(URL.createObjectURL(file))
 
         // Create image from first frame for canvas
         const canvas = document.createElement('canvas')
@@ -316,7 +307,6 @@ export default function MemeGenerator() {
         setBaseImage(img)
         setIsGifFile(false)
         setGifFrames([])
-        setGifPreviewUrl('')
       }
 
       setTextLayers([])
@@ -325,8 +315,6 @@ export default function MemeGenerator() {
     } catch (error) {
       console.error('Failed to load image:', error)
       alert('Failed to load image. Please try another file.')
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -567,41 +555,9 @@ export default function MemeGenerator() {
       defaultTexts: relativeTexts,
     }
 
-    // Output to console for easy copy-paste
-    console.log('='.repeat(80))
-    console.log('TEMPLATE CONFIG FOR: ' + template.name)
-    console.log('='.repeat(80))
-    console.log(JSON.stringify(templateConfig, null, 2))
-    console.log('='.repeat(80))
-
-    alert('Template config saved to console! Check DevTools.')
-  }
-
-  const handleDownloadBaseImage = () => {
-    if (!baseImage) return
-
-    const canvas = document.createElement('canvas')
-    canvas.width = baseImage.width
-    canvas.height = baseImage.height
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    ctx.drawImage(baseImage, 0, 0)
-
-    const template = MEME_TEMPLATES.find(t => t.id === selectedTemplate)
-    const filename = template?.id ? `${template.id}.jpg` : 'meme-template.jpg'
-
-    canvas.toBlob(blob => {
-      if (!blob) return
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = filename
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-    }, 'image/jpeg')
+    // Copy to clipboard instead of console
+    navigator.clipboard.writeText(JSON.stringify(templateConfig, null, 2))
+    alert('Template config copied to clipboard!')
   }
 
   const selectedLayer = textLayers.find(l => l.id === selectedLayerId)

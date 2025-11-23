@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, ReactNode } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 interface DropdownOption {
   value: string

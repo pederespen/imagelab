@@ -26,6 +26,7 @@ export async function parseGifFrames(file: File): Promise<GifFrame[]> {
   const fullWidth = gif.lsd.width
   const fullHeight = gif.lsd.height
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return frames.map((frame: any) => {
     const { dims, patch, delay } = frame
 
@@ -59,7 +60,7 @@ export async function parseGifFrames(file: File): Promise<GifFrame[]> {
 /**
  * Create an animated GIF preview from frames
  */
-export function createGifPreview(frames: GifFrame[]): string {
+export function createGifPreview(_frames: GifFrame[]): string {
   // For preview, we'll use the original file's blob URL
   // This function is kept for potential future use
   return ''

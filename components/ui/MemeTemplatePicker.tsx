@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { ChevronDown, Upload } from 'lucide-react'
 import { MemeTemplate } from '@/lib/types/meme'
 
@@ -47,7 +48,7 @@ export default function MemeTemplatePicker({
       {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full h-9 px-3 rounded-md bg-card border border-border hover:bg-muted transition-colors flex items-center justify-between gap-2 text-sm text-foreground"
+        className="w-full h-[30px] px-3 rounded-md bg-card border border-border hover:bg-muted transition-colors flex items-center justify-between gap-2 text-sm text-foreground"
       >
         <span className="truncate">{selectedTemplate?.name || 'Select Template'}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -76,10 +77,12 @@ export default function MemeTemplatePicker({
                   </div>
                 ) : (
                   <>
-                    <img
+                    <Image
                       src={template.imagePath}
                       alt={template.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(max-width: 768px) 25vw, (max-width: 1024px) 20vw, 15vw"
+                      className="object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="absolute bottom-0 left-0 right-0 p-2">

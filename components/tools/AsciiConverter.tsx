@@ -1,17 +1,17 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { Upload, Copy, Check, Download } from 'lucide-react'
 import {
   imageToAscii,
   loadImageData,
   calculateFontSize,
-  CHARACTER_SETS,
   type CharacterSet,
   type AsciiOptions,
 } from '@/lib/utils/ascii'
 import { isGif, parseGifFrames, generateAsciiGif, type GifFrame } from '@/lib/utils/gif'
-import { Button, Card, CardHeader, CardTitle, Dropdown, Slider } from '@/components/ui'
+import { Button, Card, Dropdown, Slider } from '@/components/ui'
 
 export default function AsciiConverter() {
   const [imageData, setImageData] = useState<ImageData | null>(null)
@@ -23,7 +23,6 @@ export default function AsciiConverter() {
   // GIF-specific state
   const [isGifFile, setIsGifFile] = useState<boolean>(false)
   const [gifFrames, setGifFrames] = useState<GifFrame[]>([])
-  const [currentFrameIndex, setCurrentFrameIndex] = useState<number>(0)
   const [isGeneratingGif, setIsGeneratingGif] = useState<boolean>(false)
   const [gifProgress, setGifProgress] = useState<number>(0)
 
@@ -77,7 +76,6 @@ export default function AsciiConverter() {
     let timeoutId: NodeJS.Timeout
 
     const animate = () => {
-      setCurrentFrameIndex(frameIndex)
       setImageData(gifFrames[frameIndex].imageData)
 
       const delay = gifFrames[frameIndex].delay
@@ -168,7 +166,7 @@ export default function AsciiConverter() {
       await navigator.clipboard.write([clipboardItem])
       setCopyStatus('copied')
       setTimeout(() => setCopyStatus('idle'), 2000)
-    } catch (error) {
+    } catch {
       // Fallback to standard clipboard API
       try {
         await navigator.clipboard.writeText(asciiArt)
@@ -178,18 +176,6 @@ export default function AsciiConverter() {
         console.error('Failed to copy:', fallbackError)
       }
     }
-  }
-
-  const handleDownload = () => {
-    const blob = new Blob([asciiArt], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'ascii-art.txt'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
   }
 
   const handleDownloadGif = async () => {
@@ -362,12 +348,24 @@ export default function AsciiConverter() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
         {/* Original Image */}
         <div className="flex flex-col gap-2">
-          <div className="bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-border p-2">
+          <div className="bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-border p-2 relative">
             {previewUrl ? (
               isGifFile ? (
-                <img src={previewUrl} alt="Original GIF" className="w-full h-full object-contain" />
+                <Image
+                  src={previewUrl}
+                  alt="Original GIF"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-contain"
+                />
               ) : (
-                <img src={previewUrl} alt="Original" className="w-full h-full object-contain" />
+                <Image
+                  src={previewUrl}
+                  alt="Original"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-contain"
+                />
               )
             ) : (
               <div className="text-center text-muted-foreground">
