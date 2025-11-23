@@ -95,9 +95,18 @@ export function isPointInTextLayer(
   ctx.font = `${layer.fontSize}px ${layer.fontFamily}`
   ctx.textAlign = layer.textAlign
 
-  const metrics = ctx.measureText(layer.text)
-  const textWidth = metrics.width
-  const textHeight = layer.fontSize * 1.2
+  // Split text into lines and measure all of them
+  const lines = layer.text.split('\n')
+  const lineHeight = layer.fontSize * 1.2
+  let maxWidth = 0
+
+  lines.forEach(line => {
+    const metrics = ctx.measureText(line)
+    maxWidth = Math.max(maxWidth, metrics.width)
+  })
+
+  const textWidth = maxWidth
+  const textHeight = lines.length * lineHeight
 
   // Transform point to text's local space
   const dx = x - layer.x
@@ -106,7 +115,10 @@ export function isPointInTextLayer(
   const localX = dx * Math.cos(angle) - dy * Math.sin(angle)
   const localY = dx * Math.sin(angle) + dy * Math.cos(angle)
 
-  const padding = 10
+  // Add stroke width and padding to hitbox
+  const extraPadding = layer.strokeWidth
+  const padding = 4 + extraPadding
+
   let left = -textWidth / 2 - padding
   if (layer.textAlign === 'left') left = -padding
   if (layer.textAlign === 'right') left = -textWidth - padding

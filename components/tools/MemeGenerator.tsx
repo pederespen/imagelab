@@ -23,6 +23,8 @@ import {
   copyCanvasToClipboard,
   createCroppedCanvas,
 } from '@/lib/utils/meme'
+import { isGif, parseGifFrames, type GifFrame } from '@/lib/utils/gif'
+import GIF from 'gif.js.optimized'
 
 const CANVAS_WIDTH = 800
 const CANVAS_HEIGHT = 600
@@ -35,45 +37,136 @@ export default function MemeGenerator() {
   const [baseImage, setBaseImage] = useState<HTMLImageElement | null>(null)
   const [textLayers, setTextLayers] = useState<TextLayer[]>([])
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null)
+  const [shouldReplaceText, setShouldReplaceText] = useState(false)
+  const [editedLayerIds, setEditedLayerIds] = useState<Set<string>>(new Set())
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle')
   const [isLoading, setIsLoading] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<string>('custom')
 
+  // GIF-specific state
+  const [isGifFile, setIsGifFile] = useState(false)
+  const [gifFrames, setGifFrames] = useState<GifFrame[]>([])
+  const [currentFrameIndex, setCurrentFrameIndex] = useState(0)
+  const [gifPreviewUrl, setGifPreviewUrl] = useState<string>('')
+  const [isGeneratingGif, setIsGeneratingGif] = useState(false)
+  const [gifProgress, setGifProgress] = useState(0)
+
+  // Animate GIF frames
+  useEffect(() => {
+    if (!isGifFile || gifFrames.length === 0 || !canvasRef.current) return
+
+    let frameIndex = 0
+    let timeoutId: NodeJS.Timeout
+
+    const animate = () => {
+      setCurrentFrameIndex(frameIndex)
+      const delay = gifFrames[frameIndex].delay
+      frameIndex = (frameIndex + 1) % gifFrames.length
+      timeoutId = setTimeout(animate, delay)
+    }
+
+    animate()
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [isGifFile, gifFrames])
+
+  // Handle paste from clipboard
+  useEffect(() => {
+    const handlePaste = async (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items
+      if (!items) return
+
+      for (const item of items) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault()
+          const file = item.getAsFile()
+          if (!file) continue
+
+          await handleFileLoad(file)
+          break
+        }
+      }
+    }
+
+    window.addEventListener('paste', handlePaste)
+    return () => window.removeEventListener('paste', handlePaste)
+  }, [])
+
   // Handle keyboard input for selected text layer
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!selectedLayerId || !selectedLayer) return
+      const selectedLayer = textLayers.find(l => l.id === selectedLayerId)
+
+      if (!selectedLayerId || !selectedLayer) {
+        // Handle escape even without selection to ensure deselect works
+        if (e.key === 'Escape' && selectedLayerId) {
+          setSelectedLayerId(null)
+        }
+        return
+      }
 
       // Ignore if user is typing in an input/textarea
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
 
+      // Handle Escape to deselect
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        setSelectedLayerId(null)
+        return
+      }
+
+      const hasBeenEdited = editedLayerIds.has(selectedLayerId)
+
       // Handle backspace
       if (e.key === 'Backspace') {
         e.preventDefault()
-        updateSelectedLayer({ text: selectedLayer.text.slice(0, -1) })
+        if (!hasBeenEdited) {
+          // First edit - clear all text
+          updateSelectedLayer({ text: '' })
+          setEditedLayerIds(prev => new Set(prev).add(selectedLayerId))
+        } else {
+          // Already edited - remove last character
+          updateSelectedLayer({ text: selectedLayer.text.slice(0, -1) })
+        }
       }
       // Handle regular character input
       else if (e.key.length === 1) {
         e.preventDefault()
-        updateSelectedLayer({ text: selectedLayer.text + e.key })
+        if (!hasBeenEdited) {
+          // First edit - replace text
+          updateSelectedLayer({ text: e.key })
+          setEditedLayerIds(prev => new Set(prev).add(selectedLayerId))
+        } else {
+          // Already edited - append
+          updateSelectedLayer({ text: selectedLayer.text + e.key })
+        }
       }
       // Handle Enter for new line
       else if (e.key === 'Enter') {
         e.preventDefault()
-        updateSelectedLayer({ text: selectedLayer.text + '\n' })
+        if (!hasBeenEdited) {
+          // First edit - replace with newline
+          updateSelectedLayer({ text: '\n' })
+          setEditedLayerIds(prev => new Set(prev).add(selectedLayerId))
+        } else {
+          // Already edited - append newline
+          updateSelectedLayer({ text: selectedLayer.text + '\n' })
+        }
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedLayerId, textLayers])
+  }, [selectedLayerId, textLayers, editedLayerIds])
 
   // Redraw canvas whenever layers or image changes
   useEffect(() => {
     redrawCanvas()
-  }, [baseImage, textLayers, selectedLayerId, theme])
+  }, [baseImage, textLayers, selectedLayerId, theme, currentFrameIndex, isGifFile, gifFrames])
 
   const redrawCanvas = (forExport = false) => {
     const canvas = canvasRef.current
@@ -90,8 +183,34 @@ export default function MemeGenerator() {
     }
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-    // Draw base image
-    if (baseImage) {
+    // Draw base image or current GIF frame
+    if (isGifFile && gifFrames.length > 0) {
+      // Find maximum dimensions across all frames for consistent scaling
+      let maxWidth = 0
+      let maxHeight = 0
+      gifFrames.forEach(frame => {
+        maxWidth = Math.max(maxWidth, frame.imageData.width)
+        maxHeight = Math.max(maxHeight, frame.imageData.height)
+      })
+
+      const scale = Math.min(canvas.width / maxWidth, canvas.height / maxHeight)
+      const x = (canvas.width - maxWidth * scale) / 2
+      const y = (canvas.height - maxHeight * scale) / 2
+
+      // Draw current frame with consistent dimensions based on max
+      const frame = gifFrames[currentFrameIndex]
+      if (frame) {
+        const tempCanvas = document.createElement('canvas')
+        tempCanvas.width = frame.imageData.width
+        tempCanvas.height = frame.imageData.height
+        const tempCtx = tempCanvas.getContext('2d')
+        if (tempCtx) {
+          tempCtx.putImageData(frame.imageData, 0, 0)
+          // Scale to match the max dimensions area
+          ctx.drawImage(tempCanvas, x, y, maxWidth * scale, maxHeight * scale)
+        }
+      }
+    } else if (baseImage) {
       const scale = Math.min(canvas.width / baseImage.width, canvas.height / baseImage.height)
       const x = (canvas.width - baseImage.width * scale) / 2
       const y = (canvas.height - baseImage.height * scale) / 2
@@ -125,6 +244,11 @@ export default function MemeGenerator() {
 
       setBaseImage(img)
 
+      // Clear GIF state when loading a preset template
+      setIsGifFile(false)
+      setGifFrames([])
+      setGifPreviewUrl('')
+
       // Convert relative positions to absolute canvas positions
       if (template.defaultTexts && template.defaultTexts.length > 0) {
         const layers: TextLayer[] = template.defaultTexts.map(relPos => ({
@@ -138,9 +262,12 @@ export default function MemeGenerator() {
         }))
         setTextLayers(layers)
         setSelectedLayerId(layers[0]?.id || null)
+        setEditedLayerIds(new Set())
       } else {
         setTextLayers([])
         setSelectedLayerId(null)
+        setShouldReplaceText(false)
+        setEditedLayerIds(new Set())
       }
     } catch (error) {
       console.error('Failed to load template:', error)
@@ -154,12 +281,47 @@ export default function MemeGenerator() {
     const file = e.target.files?.[0]
     if (!file) return
 
+    await handleFileLoad(file)
+  }
+
+  const handleFileLoad = async (file: File) => {
     setIsLoading(true)
     try {
-      const img = await loadImageFromFile(file)
-      setBaseImage(img)
+      // Check if it's a GIF
+      if (isGif(file)) {
+        // Parse GIF frames
+        const frames = await parseGifFrames(file)
+        setGifFrames(frames)
+        setIsGifFile(true)
+        setGifPreviewUrl(URL.createObjectURL(file))
+
+        // Create image from first frame for canvas
+        const canvas = document.createElement('canvas')
+        canvas.width = frames[0].imageData.width
+        canvas.height = frames[0].imageData.height
+        const ctx = canvas.getContext('2d')
+        if (ctx) {
+          ctx.putImageData(frames[0].imageData, 0, 0)
+          const img = new Image()
+          await new Promise((resolve, reject) => {
+            img.onload = resolve
+            img.onerror = reject
+            img.src = canvas.toDataURL()
+          })
+          setBaseImage(img)
+        }
+      } else {
+        // Regular image
+        const img = await loadImageFromFile(file)
+        setBaseImage(img)
+        setIsGifFile(false)
+        setGifFrames([])
+        setGifPreviewUrl('')
+      }
+
       setTextLayers([])
       setSelectedLayerId(null)
+      setSelectedTemplate('custom')
     } catch (error) {
       console.error('Failed to load image:', error)
       alert('Failed to load image. Please try another file.')
@@ -228,23 +390,135 @@ export default function MemeGenerator() {
     const x = ((e.clientX - rect.left) / rect.width) * canvas.width
     const y = ((e.clientY - rect.top) / rect.height) * canvas.height
 
-    updateSelectedLayer({
-      x: x - dragOffset.x,
-      y: y - dragOffset.y,
-    })
+    const newX = x - dragOffset.x
+    const newY = y - dragOffset.y
+
+    updateSelectedLayer({ x: newX, y: newY })
   }
 
   const handleCanvasMouseUp = () => {
     setIsDragging(false)
   }
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const canvas = canvasRef.current
     if (!canvas || !baseImage) return
+
+    // If it's a GIF, download as animated GIF
+    if (isGifFile && gifFrames.length > 0) {
+      await handleDownloadGif()
+      return
+    }
+
+    // Otherwise download as static image
     redrawCanvas(true) // Redraw with white background for export
     const croppedCanvas = createCroppedCanvas(canvas, baseImage)
     downloadCanvas(croppedCanvas)
     redrawCanvas(false) // Restore preview background
+  }
+
+  const handleDownloadGif = async () => {
+    if (!isGifFile || gifFrames.length === 0) return
+
+    setIsGeneratingGif(true)
+    setGifProgress(0)
+
+    try {
+      // Calculate the image bounds for cropping
+      const frame = gifFrames[0]
+      const scale = Math.min(
+        CANVAS_WIDTH / frame.imageData.width,
+        CANVAS_HEIGHT / frame.imageData.height
+      )
+      const imageWidth = frame.imageData.width * scale
+      const imageHeight = frame.imageData.height * scale
+      const imageX = (CANVAS_WIDTH - imageWidth) / 2
+      const imageY = (CANVAS_HEIGHT - imageHeight) / 2
+
+      const gif = new GIF({
+        workers: 2,
+        quality: 10,
+        width: Math.round(imageWidth),
+        height: Math.round(imageHeight),
+        workerScript: '/gif.worker.js',
+      })
+
+      // Render each frame with text overlays
+      for (let i = 0; i < gifFrames.length; i++) {
+        const frame = gifFrames[i]
+        const tempCanvas = document.createElement('canvas')
+        tempCanvas.width = CANVAS_WIDTH
+        tempCanvas.height = CANVAS_HEIGHT
+        const tempCtx = tempCanvas.getContext('2d')
+
+        if (tempCtx) {
+          // White background
+          tempCtx.fillStyle = '#ffffff'
+          tempCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+
+          // Draw frame
+          const frameCanvas = document.createElement('canvas')
+          frameCanvas.width = frame.imageData.width
+          frameCanvas.height = frame.imageData.height
+          const frameCtx = frameCanvas.getContext('2d')
+          if (frameCtx) {
+            frameCtx.putImageData(frame.imageData, 0, 0)
+            tempCtx.drawImage(frameCanvas, imageX, imageY, imageWidth, imageHeight)
+          }
+
+          // Draw text layers
+          textLayers.forEach(layer => {
+            drawTextLayer(tempCtx, layer, false)
+          })
+
+          // Crop to image bounds
+          const croppedCanvas = document.createElement('canvas')
+          croppedCanvas.width = Math.round(imageWidth)
+          croppedCanvas.height = Math.round(imageHeight)
+          const croppedCtx = croppedCanvas.getContext('2d')
+          if (croppedCtx) {
+            croppedCtx.drawImage(
+              tempCanvas,
+              imageX,
+              imageY,
+              imageWidth,
+              imageHeight,
+              0,
+              0,
+              imageWidth,
+              imageHeight
+            )
+            gif.addFrame(croppedCanvas, { delay: frame.delay })
+          }
+        }
+
+        setGifProgress(Math.floor(((i + 1) / gifFrames.length) * 80))
+      }
+
+      gif.on('progress', (progress: number) => {
+        setGifProgress(80 + Math.floor(progress * 20))
+      })
+
+      gif.on('finished', (blob: Blob) => {
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'meme.gif'
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+        setIsGeneratingGif(false)
+        setGifProgress(0)
+      })
+
+      gif.render()
+    } catch (error) {
+      console.error('Error generating GIF:', error)
+      alert('Failed to generate GIF. Please try again.')
+      setIsGeneratingGif(false)
+      setGifProgress(0)
+    }
   }
 
   const handleCopyToClipboard = async () => {
@@ -416,10 +690,11 @@ export default function MemeGenerator() {
                   variant="primary"
                   size="sm"
                   onClick={handleDownload}
+                  disabled={isGeneratingGif}
                   className="inline-flex items-center justify-center"
                 >
                   <Download className="w-3.5 h-3.5 mr-1.5" />
-                  Download
+                  {isGeneratingGif ? `${gifProgress}%` : 'Download'}
                 </Button>
               </>
             )}
@@ -446,6 +721,10 @@ export default function MemeGenerator() {
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="text-center text-muted-foreground px-4">
                   <p className="text-sm">Select a preset or upload your own image to get started</p>
+                  <p className="text-xs mt-1 opacity-75">You can also paste an image</p>
+                  <p className="text-xs mt-1 opacity-75">
+                    (GIFs must be uploaded to preserve animation)
+                  </p>
                 </div>
               </div>
             )}
@@ -533,12 +812,14 @@ export default function MemeGenerator() {
                   />
                 </>
               ) : (
-                <div className="text-center text-muted-foreground py-8">
-                  <p className="text-sm">
-                    {textLayers.length > 0
-                      ? 'Click a text layer to edit'
-                      : 'Add a text layer to get started'}
-                  </p>
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center text-muted-foreground px-4">
+                    <p className="text-sm">
+                      {textLayers.length > 0
+                        ? 'Click a text layer to edit'
+                        : 'Add a text layer to get started'}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
