@@ -286,8 +286,8 @@ export default function AsciiConverter() {
       {/* Image and Output Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
         {/* Original Image */}
-        <div className="flex flex-col gap-2 min-h-0">
-          <div className="bg-muted rounded-lg overflow-hidden flex-1 flex items-center justify-center border border-border min-h-[400px]">
+        <div className="flex flex-col gap-2">
+          <div className="bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-border">
             {previewUrl ? (
               <img
                 src={previewUrl}
@@ -303,10 +303,10 @@ export default function AsciiConverter() {
         </div>
 
         {/* ASCII Output */}
-        <div className="flex flex-col gap-2 min-h-0">
+        <div className="flex flex-col gap-2">
           <div
             ref={asciiContainerRef}
-            className="bg-card border border-border rounded-lg overflow-auto flex-1 min-h-[400px]"
+            className="bg-card border border-border rounded-lg overflow-auto aspect-square"
           >
             {asciiArt ? (
               <pre
