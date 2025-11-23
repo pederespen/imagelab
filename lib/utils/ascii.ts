@@ -13,7 +13,6 @@ export interface AsciiOptions {
   width: number
   characterSet: CharacterSet
   invert: boolean
-  disableAutoCrop?: boolean
 }
 
 /**
@@ -357,20 +356,17 @@ function imageToBraille(imageData: ImageData, width: number, invert: boolean): s
  * Convert an image to ASCII art using specified character set
  */
 export function imageToAscii(imageData: ImageData, options: AsciiOptions): string {
-  const { width, characterSet, invert, disableAutoCrop = false } = options
-
-  // Auto-crop whitespace first (unless disabled for GIF animations)
-  const cropped = disableAutoCrop ? imageData : autoCropWhitespace(imageData)
+  const { width, characterSet, invert } = options
 
   // Handle Braille mode separately
   if (characterSet === 'braille') {
-    return imageToBraille(cropped, width, invert)
+    return imageToBraille(imageData, width, invert)
   }
 
   const chars = CHARACTER_SETS[characterSet] as string
 
   // Apply light smoothing to reduce texture noise, then enhance contrast
-  const smoothed = gaussianBlur(cropped, 1)
+  const smoothed = gaussianBlur(imageData, 1)
   const processedData = enhanceContrast(smoothed)
 
   // Calculate height maintaining aspect ratio

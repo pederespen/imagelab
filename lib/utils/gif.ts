@@ -118,11 +118,8 @@ export async function generateAsciiGif(
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
     try {
-      // Disable auto-crop for consistent frame sizes
-      const gifOptions = { ...options, disableAutoCrop: true }
-
       // Convert first frame to get dimensions
-      const firstAscii = imageToAscii(frames[0].imageData, gifOptions)
+      const firstAscii = imageToAscii(frames[0].imageData, options)
       const lines = firstAscii.split('\n').filter(line => line.length > 0)
       const maxLineLength = Math.max(...lines.map(line => line.length))
 
@@ -144,14 +141,14 @@ export async function generateAsciiGif(
 
       // Convert each frame to ASCII and add to GIF
       frames.forEach((frame, index) => {
-        const asciiText = imageToAscii(frame.imageData, gifOptions)
+        const asciiText = imageToAscii(frame.imageData, options)
         const imageData = asciiToImageData(asciiText, fontSize)
 
         // Create canvas for this frame
         const canvas = document.createElement('canvas')
         canvas.width = width
         canvas.height = height
-        const ctx = canvas.getContext('2d')
+        const ctx = canvas.getContext('2d', { willReadFrequently: true })
         if (!ctx) throw new Error('Could not get canvas context')
 
         ctx.putImageData(imageData, 0, 0)

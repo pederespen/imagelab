@@ -137,7 +137,6 @@ export default function AsciiConverter() {
         width: debouncedWidth,
         characterSet,
         invert,
-        disableAutoCrop: isGifFile, // Disable auto-crop for GIFs to maintain consistent size
       }
       const ascii = imageToAscii(imageData, options)
       setAsciiArt(ascii)
@@ -231,7 +230,7 @@ export default function AsciiConverter() {
       {/* Controls Bar */}
       <div className="flex-shrink-0">
         <Card>
-          <div className="p-3">
+          <div className="p-2">
             <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
               <Button
                 variant="primary"
@@ -363,20 +362,12 @@ export default function AsciiConverter() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
         {/* Original Image */}
         <div className="flex flex-col gap-2">
-          <div className="bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-border">
+          <div className="bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-border p-2">
             {previewUrl ? (
               isGifFile ? (
-                <img
-                  src={previewUrl}
-                  alt="Original GIF"
-                  className="max-w-full max-h-full object-contain"
-                />
+                <img src={previewUrl} alt="Original GIF" className="w-full h-full object-contain" />
               ) : (
-                <img
-                  src={previewUrl}
-                  alt="Original"
-                  className="max-w-full max-h-full object-contain"
-                />
+                <img src={previewUrl} alt="Original" className="w-full h-full object-contain" />
               )
             ) : (
               <div className="text-center text-muted-foreground">
@@ -385,14 +376,6 @@ export default function AsciiConverter() {
               </div>
             )}
           </div>
-          {isGifFile && gifFrames.length > 0 && (
-            <div className="flex items-center justify-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <p className="text-xs text-muted-foreground">
-                Animated GIF • {gifFrames.length} frames
-              </p>
-            </div>
-          )}
         </div>
 
         {/* ASCII Output */}
@@ -414,11 +397,6 @@ export default function AsciiConverter() {
               </div>
             )}
           </div>
-          {isGifFile && gifFrames.length > 0 && asciiArt && (
-            <p className="text-xs text-muted-foreground text-center">
-              ASCII Animation • Frame {currentFrameIndex + 1}/{gifFrames.length}
-            </p>
-          )}
         </div>
       </div>
 
