@@ -171,8 +171,12 @@ export default function MemeGenerator() {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
     if (!ctx) return
+
+    // Enable high-quality image smoothing
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
 
     // Clear canvas - use white for export, theme-aware muted for preview
     if (forExport) {
@@ -202,7 +206,7 @@ export default function MemeGenerator() {
         const tempCanvas = document.createElement('canvas')
         tempCanvas.width = frame.imageData.width
         tempCanvas.height = frame.imageData.height
-        const tempCtx = tempCanvas.getContext('2d')
+        const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true })
         if (tempCtx) {
           tempCtx.putImageData(frame.imageData, 0, 0)
           // Scale to match the max dimensions area
@@ -291,7 +295,7 @@ export default function MemeGenerator() {
         const canvas = document.createElement('canvas')
         canvas.width = frames[0].imageData.width
         canvas.height = frames[0].imageData.height
-        const ctx = canvas.getContext('2d')
+        const ctx = canvas.getContext('2d', { willReadFrequently: true })
         if (ctx) {
           ctx.putImageData(frames[0].imageData, 0, 0)
           const img = new Image()

@@ -25,29 +25,66 @@ export async function parseGifFrames(file: File): Promise<GifFrame[]> {
   const fullWidth = gif.lsd.width
   const fullHeight = gif.lsd.height
 
+  // Create persistent canvas for frame composition
+  const compositeCanvas = document.createElement('canvas')
+  compositeCanvas.width = fullWidth
+  compositeCanvas.height = fullHeight
+  const compositeCtx = compositeCanvas.getContext('2d', { willReadFrequently: true })
+
+  if (!compositeCtx) throw new Error('Could not get canvas context')
+
+  // Set background from GIF global color table if available
+  if (gif.lsd.gct && gif.lsd.backgroundColorIndex !== undefined) {
+    const bgColorIndex = gif.lsd.backgroundColorIndex * 3
+    const r = gif.lsd.gct[bgColorIndex]
+    const g = gif.lsd.gct[bgColorIndex + 1]
+    const b = gif.lsd.gct[bgColorIndex + 2]
+    compositeCtx.fillStyle = `rgb(${r},${g},${b})`
+    compositeCtx.fillRect(0, 0, fullWidth, fullHeight)
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return frames.map((frame: any) => {
-    const { dims, patch, delay } = frame
-
-    // Create a full-size canvas
-    const canvas = document.createElement('canvas')
-    canvas.width = fullWidth
-    canvas.height = fullHeight
-    const ctx = canvas.getContext('2d', { willReadFrequently: true })
-
-    if (!ctx) throw new Error('Could not get canvas context')
-
-    // Fill with transparent background
-    ctx.clearRect(0, 0, fullWidth, fullHeight)
+  return frames.map((frame: any, index: number) => {
+    const { dims, patch, delay, disposalType } = frame
 
     // Create ImageData from the frame patch
     const patchImageData = new ImageData(new Uint8ClampedArray(patch), dims.width, dims.height)
 
-    // Draw the patch at its offset position
-    ctx.putImageData(patchImageData, dims.left, dims.top)
+    // Create temporary canvas for the patch
+    const patchCanvas = document.createElement('canvas')
+    patchCanvas.width = dims.width
+    patchCanvas.height = dims.height
+    const patchCtx = patchCanvas.getContext('2d', { willReadFrequently: true })
 
-    // Get the full-size image data
-    const imageData = ctx.getImageData(0, 0, fullWidth, fullHeight)
+    if (!patchCtx) throw new Error('Could not get patch canvas context')
+
+    patchCtx.putImageData(patchImageData, 0, 0)
+
+    // Composite the patch onto the main canvas at the correct position
+    compositeCtx.drawImage(patchCanvas, dims.left, dims.top)
+
+    // Get the current composite frame
+    const imageData = compositeCtx.getImageData(0, 0, fullWidth, fullHeight)
+
+    // Handle disposal method for next frame
+    // disposalType: 0 = no disposal, 1 = do not dispose, 2 = restore to background, 3 = restore to previous
+    if (disposalType === 2) {
+      // Restore to background color
+      if (gif.lsd.gct && gif.lsd.backgroundColorIndex !== undefined) {
+        const bgColorIndex = gif.lsd.backgroundColorIndex * 3
+        const r = gif.lsd.gct[bgColorIndex]
+        const g = gif.lsd.gct[bgColorIndex + 1]
+        const b = gif.lsd.gct[bgColorIndex + 2]
+        compositeCtx.fillStyle = `rgb(${r},${g},${b})`
+      } else {
+        compositeCtx.fillStyle = 'transparent'
+      }
+      compositeCtx.fillRect(dims.left, dims.top, dims.width, dims.height)
+    } else if (disposalType === 3) {
+      // Restore to previous - this would need frame caching, skip for now
+      // Most GIFs don't use this disposal method
+    }
+    // disposalType 0 or 1: keep the frame, do nothing
 
     return {
       imageData,
