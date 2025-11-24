@@ -40,7 +40,7 @@ export default function MemeGenerator() {
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle')
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('custom')
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('')
 
   // GIF-specific state
   const [isGifFile, setIsGifFile] = useState(false)
@@ -432,7 +432,7 @@ export default function MemeGenerator() {
         quality: 10,
         width: Math.round(imageWidth),
         height: Math.round(imageHeight),
-        workerScript: '/gif.worker.js',
+        workerScript: getAssetPath('/gif.worker.js'),
       })
 
       // Render each frame with text overlays
@@ -441,7 +441,7 @@ export default function MemeGenerator() {
         const tempCanvas = document.createElement('canvas')
         tempCanvas.width = CANVAS_WIDTH
         tempCanvas.height = CANVAS_HEIGHT
-        const tempCtx = tempCanvas.getContext('2d')
+        const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true })
 
         if (tempCtx) {
           // White background
@@ -452,7 +452,7 @@ export default function MemeGenerator() {
           const frameCanvas = document.createElement('canvas')
           frameCanvas.width = frame.imageData.width
           frameCanvas.height = frame.imageData.height
-          const frameCtx = frameCanvas.getContext('2d')
+          const frameCtx = frameCanvas.getContext('2d', { willReadFrequently: true })
           if (frameCtx) {
             frameCtx.putImageData(frame.imageData, 0, 0)
             tempCtx.drawImage(frameCanvas, imageX, imageY, imageWidth, imageHeight)
@@ -467,7 +467,7 @@ export default function MemeGenerator() {
           const croppedCanvas = document.createElement('canvas')
           croppedCanvas.width = Math.round(imageWidth)
           croppedCanvas.height = Math.round(imageHeight)
-          const croppedCtx = croppedCanvas.getContext('2d')
+          const croppedCtx = croppedCanvas.getContext('2d', { willReadFrequently: true })
           if (croppedCtx) {
             croppedCtx.drawImage(
               tempCanvas,

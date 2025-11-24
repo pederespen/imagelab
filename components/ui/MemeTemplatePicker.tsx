@@ -50,7 +50,7 @@ export default function MemeTemplatePicker({
         onClick={() => setIsOpen(!isOpen)}
         className="w-full h-[30px] px-3 rounded-md bg-card border border-border hover:bg-muted transition-colors flex items-center justify-between gap-2 text-sm text-foreground"
       >
-        <span className="truncate">{selectedTemplate?.name || 'Select Template'}</span>
+        <span className="truncate">{selectedTemplate?.name || 'Select your template'}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
