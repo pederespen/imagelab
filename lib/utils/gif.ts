@@ -35,62 +35,70 @@ export async function parseGifFrames(file: File): Promise<GifFrame[]> {
 
   // Set background from GIF global color table if available
   if (gif.lsd.gct && gif.lsd.backgroundColorIndex !== undefined) {
+    const gct = gif.lsd.gct as unknown as number[]
     const bgColorIndex = gif.lsd.backgroundColorIndex * 3
-    const r = gif.lsd.gct[bgColorIndex]
-    const g = gif.lsd.gct[bgColorIndex + 1]
-    const b = gif.lsd.gct[bgColorIndex + 2]
+    const r = gct[bgColorIndex]
+    const g = gct[bgColorIndex + 1]
+    const b = gct[bgColorIndex + 2]
     compositeCtx.fillStyle = `rgb(${r},${g},${b})`
     compositeCtx.fillRect(0, 0, fullWidth, fullHeight)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return frames.map((frame: any, index: number) => {
-    const { dims, patch, delay, disposalType } = frame
+  return frames.map(
+    (frame: {
+      dims: { left: number; top: number; width: number; height: number }
+      patch: Uint8ClampedArray
+      delay: number
+      disposalType: number
+    }) => {
+      const { dims, patch, delay, disposalType } = frame
 
-    // Create ImageData from the frame patch
-    const patchImageData = new ImageData(new Uint8ClampedArray(patch), dims.width, dims.height)
+      // Create ImageData from the frame patch
+      const patchImageData = new ImageData(new Uint8ClampedArray(patch), dims.width, dims.height)
 
-    // Create temporary canvas for the patch
-    const patchCanvas = document.createElement('canvas')
-    patchCanvas.width = dims.width
-    patchCanvas.height = dims.height
-    const patchCtx = patchCanvas.getContext('2d', { willReadFrequently: true })
+      // Create temporary canvas for the patch
+      const patchCanvas = document.createElement('canvas')
+      patchCanvas.width = dims.width
+      patchCanvas.height = dims.height
+      const patchCtx = patchCanvas.getContext('2d', { willReadFrequently: true })
 
-    if (!patchCtx) throw new Error('Could not get patch canvas context')
+      if (!patchCtx) throw new Error('Could not get patch canvas context')
 
-    patchCtx.putImageData(patchImageData, 0, 0)
+      patchCtx.putImageData(patchImageData, 0, 0)
 
-    // Composite the patch onto the main canvas at the correct position
-    compositeCtx.drawImage(patchCanvas, dims.left, dims.top)
+      // Composite the patch onto the main canvas at the correct position
+      compositeCtx.drawImage(patchCanvas, dims.left, dims.top)
 
-    // Get the current composite frame
-    const imageData = compositeCtx.getImageData(0, 0, fullWidth, fullHeight)
+      // Get the current composite frame
+      const imageData = compositeCtx.getImageData(0, 0, fullWidth, fullHeight)
 
-    // Handle disposal method for next frame
-    // disposalType: 0 = no disposal, 1 = do not dispose, 2 = restore to background, 3 = restore to previous
-    if (disposalType === 2) {
-      // Restore to background color
-      if (gif.lsd.gct && gif.lsd.backgroundColorIndex !== undefined) {
-        const bgColorIndex = gif.lsd.backgroundColorIndex * 3
-        const r = gif.lsd.gct[bgColorIndex]
-        const g = gif.lsd.gct[bgColorIndex + 1]
-        const b = gif.lsd.gct[bgColorIndex + 2]
-        compositeCtx.fillStyle = `rgb(${r},${g},${b})`
-      } else {
-        compositeCtx.fillStyle = 'transparent'
+      // Handle disposal method for next frame
+      // disposalType: 0 = no disposal, 1 = do not dispose, 2 = restore to background, 3 = restore to previous
+      if (disposalType === 2) {
+        // Restore to background color
+        if (gif.lsd.gct && gif.lsd.backgroundColorIndex !== undefined) {
+          const gct = gif.lsd.gct as unknown as number[]
+          const bgColorIndex = gif.lsd.backgroundColorIndex * 3
+          const r = gct[bgColorIndex]
+          const g = gct[bgColorIndex + 1]
+          const b = gct[bgColorIndex + 2]
+          compositeCtx.fillStyle = `rgb(${r},${g},${b})`
+        } else {
+          compositeCtx.fillStyle = 'transparent'
+        }
+        compositeCtx.fillRect(dims.left, dims.top, dims.width, dims.height)
+      } else if (disposalType === 3) {
+        // Restore to previous - this would need frame caching, skip for now
+        // Most GIFs don't use this disposal method
       }
-      compositeCtx.fillRect(dims.left, dims.top, dims.width, dims.height)
-    } else if (disposalType === 3) {
-      // Restore to previous - this would need frame caching, skip for now
-      // Most GIFs don't use this disposal method
-    }
-    // disposalType 0 or 1: keep the frame, do nothing
+      // disposalType 0 or 1: keep the frame, do nothing
 
-    return {
-      imageData,
-      delay: delay || 100, // Default 100ms if no delay specified
+      return {
+        imageData,
+        delay: delay || 100, // Default 100ms if no delay specified
+      }
     }
-  })
+  )
 }
 
 /**
