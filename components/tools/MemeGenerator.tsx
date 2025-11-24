@@ -23,6 +23,7 @@ import {
   createCroppedCanvas,
 } from '@/lib/utils/meme'
 import { isGif, parseGifFrames, type GifFrame } from '@/lib/utils/gif'
+import { getAssetPath } from '@/lib/utils/assets'
 
 const CANVAS_WIDTH = 800
 const CANVAS_HEIGHT = 600
@@ -234,9 +235,10 @@ export default function MemeGenerator() {
       }
 
       // Load from URL if it starts with http, otherwise from local path
-      const img = template.imagePath.startsWith('http')
-        ? await loadImageFromUrl(template.imagePath)
-        : await loadImageFromUrl(template.imagePath) // Will handle local paths too
+      const imagePath = template.imagePath.startsWith('http')
+        ? template.imagePath
+        : getAssetPath(template.imagePath)
+      const img = await loadImageFromUrl(imagePath)
 
       setBaseImage(img)
 

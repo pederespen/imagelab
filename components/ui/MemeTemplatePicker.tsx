@@ -62,7 +62,7 @@ export default function MemeTemplatePicker({
               <button
                 key={template.id}
                 onClick={() => handleSelect(template.id)}
-                className={`group relative aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
+                className={`group relative aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 cursor-pointer ${
                   template.id === selectedId
                     ? 'border-primary ring-2 ring-primary/20'
                     : 'border-border hover:border-muted-foreground'
