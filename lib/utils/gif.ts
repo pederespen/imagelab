@@ -161,12 +161,16 @@ export async function generateAsciiGif(
   options: AsciiOptions,
   onProgress?: (progress: number) => void
 ): Promise<Blob> {
+  console.log('[generateAsciiGif] Starting with', frames.length, 'frames')
   return new Promise(async (resolve, reject) => {
     try {
+      console.log('[generateAsciiGif] Importing gif.js.optimized')
       // Dynamic import to avoid SSR issues
       const GIF = (await import('gif.js.optimized')).default
+      console.log('[generateAsciiGif] GIF library loaded:', typeof GIF)
 
       // Convert first frame to get dimensions
+      console.log('[generateAsciiGif] Converting first frame to ASCII for dimensions')
       const firstAscii = imageToAscii(frames[0].imageData, options)
       const lines = firstAscii.split('\n').filter(line => line.length > 0)
       const maxLineLength = Math.max(...lines.map(line => line.length))
@@ -177,18 +181,25 @@ export async function generateAsciiGif(
       const lineHeight = fontSize * 1.2
       const width = Math.ceil(charWidth * maxLineLength) + 20
       const height = Math.ceil(lineHeight * lines.length) + 20
+      console.log('[generateAsciiGif] GIF dimensions:', width, 'x', height)
 
       // Initialize GIF encoder
+      console.log('[generateAsciiGif] Initializing GIF encoder')
       const gif = new GIF({
         workers: 2,
         quality: 10,
         width,
         height,
-        workerScript: '/gif.worker.js', // We'll need to add this to public
+        workerScript: '/gif.worker.js',
       })
+      console.log('[generateAsciiGif] GIF encoder created')
 
       // Convert each frame to ASCII and add to GIF
+      console.log('[generateAsciiGif] Starting frame conversion loop')
       frames.forEach((frame, index) => {
+        if (index % 10 === 0) {
+          console.log(`[generateAsciiGif] Processing frame ${index}/${frames.length}`)
+        }
         const asciiText = imageToAscii(frame.imageData, options)
         const imageData = asciiToImageData(asciiText, fontSize)
 
@@ -207,19 +218,25 @@ export async function generateAsciiGif(
           onProgress(((index + 1) / frames.length) * 0.8) // 80% progress for frame conversion
         }
       })
+      console.log('[generateAsciiGif] All frames added to GIF encoder')
 
       gif.on('progress', (progress: number) => {
+        console.log('[generateAsciiGif] Encoding progress:', (progress * 100).toFixed(1) + '%')
         if (onProgress) {
           onProgress(0.8 + progress * 0.2) // Last 20% for encoding
         }
       })
 
       gif.on('finished', (blob: Blob) => {
+        console.log('[generateAsciiGif] GIF encoding finished! Blob size:', blob.size, 'bytes')
         resolve(blob)
       })
 
+      console.log('[generateAsciiGif] Starting GIF render')
       gif.render()
+      console.log('[generateAsciiGif] Render called, waiting for encoding to complete')
     } catch (error) {
+      console.error('[generateAsciiGif] Error:', error)
       reject(error)
     }
   })
