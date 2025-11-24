@@ -632,24 +632,26 @@ export default function MemeGenerator() {
                     Save Config
                   </Button>
                 )}
-                <Button
-                  variant={copyStatus === 'copied' ? 'success' : 'secondary'}
-                  size="sm"
-                  onClick={handleCopyToClipboard}
-                  className="inline-flex items-center justify-center"
-                >
-                  {copyStatus === 'copied' ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 mr-1.5" />
-                      Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5 mr-1.5" />
-                      Copy
-                    </>
-                  )}
-                </Button>
+                {!isGifFile && (
+                  <Button
+                    variant={copyStatus === 'copied' ? 'success' : 'secondary'}
+                    size="sm"
+                    onClick={handleCopyToClipboard}
+                    className="inline-flex items-center justify-center"
+                  >
+                    {copyStatus === 'copied' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 mr-1.5" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 mr-1.5" />
+                        Copy
+                      </>
+                    )}
+                  </Button>
+                )}
                 <Button
                   variant="primary"
                   size="sm"
