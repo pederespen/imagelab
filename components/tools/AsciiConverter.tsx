@@ -178,25 +178,17 @@ export default function AsciiConverter() {
   }
 
   const handleDownloadGif = async () => {
-    console.log('[handleDownloadGif] Starting download')
-    if (!isGifFile || gifFrames.length === 0) {
-      console.log('[handleDownloadGif] Not a GIF or no frames')
-      return
-    }
+    if (!isGifFile || gifFrames.length === 0) return
 
-    console.log('[handleDownloadGif] GIF has', gifFrames.length, 'frames')
     setIsGeneratingGif(true)
     setGifProgress(0)
 
     try {
       const options: AsciiOptions = { width, characterSet, invert }
-      console.log('[handleDownloadGif] Calling generateAsciiGif with options:', options)
       const blob = await generateAsciiGif(gifFrames, options, progress => {
-        console.log('[handleDownloadGif] Progress callback:', progress)
         setGifProgress(Math.floor(progress * 100))
       })
 
-      console.log('[handleDownloadGif] Blob received, size:', blob.size)
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -205,12 +197,10 @@ export default function AsciiConverter() {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-      console.log('[handleDownloadGif] Download complete')
     } catch (error) {
-      console.error('[handleDownloadGif] Error generating GIF:', error)
+      console.error('Error generating GIF:', error)
       alert('Failed to generate GIF. Please try again.')
     } finally {
-      console.log('[handleDownloadGif] Cleanup')
       setIsGeneratingGif(false)
       setGifProgress(0)
     }
@@ -357,7 +347,15 @@ export default function AsciiConverter() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
         {/* Original Image */}
         <div className="flex flex-col gap-2">
-          <div className="bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-border p-2">
+          <div className="bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-border p-2 relative">
+            {isProcessing && (
+              <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10">
+                <div className="text-center">
+                  <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite] mb-2" />
+                  <p className="text-sm text-muted-foreground">Loading GIF...</p>
+                </div>
+              </div>
+            )}
             {previewUrl ? (
               isGifFile ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
@@ -382,8 +380,16 @@ export default function AsciiConverter() {
         <div className="flex flex-col gap-2">
           <div
             ref={asciiContainerRef}
-            className="bg-muted border border-border rounded-lg overflow-auto aspect-square"
+            className="bg-muted border border-border rounded-lg overflow-auto aspect-square relative"
           >
+            {isProcessing && (
+              <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10">
+                <div className="text-center">
+                  <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite] mb-2" />
+                  <p className="text-sm text-muted-foreground">Processing...</p>
+                </div>
+              </div>
+            )}
             {asciiArt ? (
               <pre
                 style={{ fontSize: `${fontSize}px`, lineHeight: '1.2' }}
