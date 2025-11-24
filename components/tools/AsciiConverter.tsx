@@ -178,17 +178,25 @@ export default function AsciiConverter() {
   }
 
   const handleDownloadGif = async () => {
-    if (!isGifFile || gifFrames.length === 0) return
+    console.log('[handleDownloadGif] Starting download')
+    if (!isGifFile || gifFrames.length === 0) {
+      console.log('[handleDownloadGif] Not a GIF or no frames')
+      return
+    }
 
+    console.log('[handleDownloadGif] GIF has', gifFrames.length, 'frames')
     setIsGeneratingGif(true)
     setGifProgress(0)
 
     try {
       const options: AsciiOptions = { width, characterSet, invert }
+      console.log('[handleDownloadGif] Calling generateAsciiGif with options:', options)
       const blob = await generateAsciiGif(gifFrames, options, progress => {
+        console.log('[handleDownloadGif] Progress callback:', progress)
         setGifProgress(Math.floor(progress * 100))
       })
 
+      console.log('[handleDownloadGif] Blob received, size:', blob.size)
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -197,10 +205,12 @@ export default function AsciiConverter() {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
+      console.log('[handleDownloadGif] Download complete')
     } catch (error) {
-      console.error('Error generating GIF:', error)
+      console.error('[handleDownloadGif] Error generating GIF:', error)
       alert('Failed to generate GIF. Please try again.')
     } finally {
+      console.log('[handleDownloadGif] Cleanup')
       setIsGeneratingGif(false)
       setGifProgress(0)
     }
