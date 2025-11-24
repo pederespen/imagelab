@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { useTheme } from './ThemeProvider'
+import { getAssetPath } from '@/lib/utils/assets'
 
 export default function Header() {
   const { theme, toggleTheme } = useTheme()
@@ -15,7 +16,9 @@ export default function Header() {
           <Link href="/" className="flex items-center gap-2 group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={theme === 'dark' ? '/imagelab-logo-dark.png' : '/imagelab-logo-light.png'}
+              src={getAssetPath(
+                theme === 'dark' ? '/imagelab-logo-dark.png' : '/imagelab-logo-light.png'
+              )}
               alt="ImageLab logo"
               width={32}
               height={32}

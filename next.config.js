@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  basePath: '/imagelab',
-  assetPrefix: '/imagelab',
+  basePath: process.env.NODE_ENV === 'production' ? '/imagelab' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/imagelab' : '',
   images: {
     unoptimized: true,
   },

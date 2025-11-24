@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { ChevronDown, Upload } from 'lucide-react'
 import { MemeTemplate } from '@/lib/types/meme'
+import { getAssetPath } from '@/lib/utils/assets'
 
 interface MemeTemplatePickerProps {
   templates: MemeTemplate[]
@@ -78,7 +79,7 @@ export default function MemeTemplatePicker({
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={template.imagePath}
+                      src={getAssetPath(template.imagePath)}
                       alt={template.name}
                       className="w-full h-full object-cover"
                     />
