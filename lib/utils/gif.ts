@@ -1,5 +1,6 @@
 import { parseGIF, decompressFrames } from 'gifuct-js'
 import { imageToAscii, type AsciiOptions } from './ascii'
+import { getAssetPath } from './assets'
 
 export interface GifFrame {
   imageData: ImageData
@@ -190,9 +191,12 @@ export async function generateAsciiGif(
         quality: 10,
         width,
         height,
-        workerScript: '/gif.worker.js',
+        workerScript: getAssetPath('/gif.worker.js'),
       })
-      console.log('[generateAsciiGif] GIF encoder created')
+      console.log(
+        '[generateAsciiGif] GIF encoder created, worker script:',
+        getAssetPath('/gif.worker.js')
+      )
 
       // Convert each frame to ASCII and add to GIF
       console.log('[generateAsciiGif] Starting frame conversion loop')
