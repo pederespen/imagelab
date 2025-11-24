@@ -698,7 +698,7 @@ export default function MemeGenerator() {
         {/* Text Editor Panel */}
         <div className="flex flex-col gap-2 min-h-0">
           <Card className="flex-1 overflow-auto">
-            <div className="p-4 space-y-4">
+            <div className="p-4 space-y-4 h-full flex flex-col">
               {selectedLayer ? (
                 <>
                   <h3 className="text-sm font-semibold text-foreground">Edit Text</h3>
@@ -776,7 +776,7 @@ export default function MemeGenerator() {
                   />
                 </>
               ) : (
-                <div className="flex items-center justify-center h-full">
+                <div className="flex items-center justify-center flex-1">
                   <div className="text-center text-muted-foreground px-4">
                     <p className="text-sm">
                       {textLayers.length > 0
