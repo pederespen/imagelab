@@ -6,6 +6,16 @@ export * from './categories'
 import { SeededRandom, solidBlock, GenerativeSettings, TileDrawer } from './types'
 import { STYLE_PATTERNS, quarterCirclePatterns } from './styles'
 
+// Styles that should always fill every tile (no solid block gaps)
+const CONTINUOUS_STYLES = [
+  'Truchet',
+  'Curved Pipes',
+  'Outlined Pipes',
+  'Diagonal Lines',
+  'Triangles',
+  'Weave',
+]
+
 export function generateArt(canvas: HTMLCanvasElement, settings: GenerativeSettings): void {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
@@ -25,21 +35,30 @@ export function generateArt(canvas: HTMLCanvasElement, settings: GenerativeSetti
   // Get patterns for selected style
   const stylePatterns = STYLE_PATTERNS[style] || quarterCirclePatterns
 
-  // Draw tiles with complexity-based pattern selection
+  // Check if this style should always draw patterns (no gaps)
+  const isContinuous = CONTINUOUS_STYLES.includes(style)
+
+  // For continuous styles, use complexity to control line thickness or other properties
+  // For other styles, use complexity to control pattern density
+
+  // Draw tiles
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       const x = col * cellSize
       const y = row * cellSize
 
-      // Use complexity to determine if we draw a pattern or solid block
-      // Higher complexity = more patterns, lower = more solid blocks
-      if (rng.next() < complexity) {
-        // Draw a pattern
+      if (isContinuous) {
+        // Always draw a pattern for continuous styles
         const pattern = rng.pick(stylePatterns)
         pattern(ctx, x, y, cellSize, palette.colors, rng)
       } else {
-        // Draw a solid block for breathing room
-        solidBlock(ctx, x, y, cellSize, palette.colors, rng)
+        // Use complexity to determine if we draw a pattern or solid block
+        if (rng.next() < complexity) {
+          const pattern = rng.pick(stylePatterns)
+          pattern(ctx, x, y, cellSize, palette.colors, rng)
+        } else {
+          solidBlock(ctx, x, y, cellSize, palette.colors, rng)
+        }
       }
     }
   }
