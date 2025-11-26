@@ -26,13 +26,38 @@ export default function GenerativeArt() {
   const [customBackground, setCustomBackground] = useState(PALETTES[0].background)
   const [isCustomPalette, setIsCustomPalette] = useState(false)
   const [canvasSizeIndex, setCanvasSizeIndex] = useState(4) // Square 1080x1080 default
+  const [customWidth, setCustomWidth] = useState(CANVAS_SIZES[4].width)
+  const [customHeight, setCustomHeight] = useState(CANVAS_SIZES[4].height)
+  const [isCustomSize, setIsCustomSize] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const canvasSize: CanvasSize = CANVAS_SIZES[canvasSizeIndex]
+  // Use custom dimensions or preset
+  const canvasSize = isCustomSize
+    ? { name: 'Custom', width: customWidth, height: customHeight }
+    : CANVAS_SIZES[canvasSizeIndex]
   const style = ART_STYLES[styleIndex]
+
+  // When selecting a preset, update custom dimensions
+  const handleSizePresetChange = (index: number) => {
+    setCanvasSizeIndex(index)
+    setCustomWidth(CANVAS_SIZES[index].width)
+    setCustomHeight(CANVAS_SIZES[index].height)
+    setIsCustomSize(false)
+  }
+
+  // When manually changing dimensions, mark as custom
+  const handleWidthChange = (width: number) => {
+    setCustomWidth(width)
+    setIsCustomSize(true)
+  }
+
+  const handleHeightChange = (height: number) => {
+    setCustomHeight(height)
+    setIsCustomSize(true)
+  }
 
   // Memoize the palette to prevent infinite re-renders
   const currentPalette = useMemo(
@@ -131,10 +156,13 @@ export default function GenerativeArt() {
     })),
   ]
 
-  const sizeOptions = CANVAS_SIZES.map((s, i) => ({
-    value: String(i),
-    label: s.name,
-  }))
+  const sizeOptions = [
+    ...(isCustomSize ? [{ value: 'custom', label: 'Custom' }] : []),
+    ...CANVAS_SIZES.map((s, i) => ({
+      value: String(i),
+      label: s.name,
+    })),
+  ]
 
   const styleOptions = ART_STYLES.map((s, i) => ({
     value: String(i),
@@ -199,11 +227,39 @@ export default function GenerativeArt() {
                 Canvas Size
               </label>
               <Dropdown
-                value={String(canvasSizeIndex)}
-                onChange={value => setCanvasSizeIndex(Number(value))}
+                value={isCustomSize ? 'custom' : String(canvasSizeIndex)}
+                onChange={value => {
+                  if (value !== 'custom') {
+                    handleSizePresetChange(Number(value))
+                  }
+                }}
                 options={sizeOptions}
                 size="sm"
               />
+              <div className="flex gap-2 mt-2">
+                <div className="flex-1">
+                  <label className="text-xs text-muted-foreground mb-1 block">Width</label>
+                  <input
+                    type="number"
+                    value={customWidth}
+                    onChange={e => handleWidthChange(Number(e.target.value))}
+                    min={100}
+                    max={8000}
+                    className="w-full px-2 py-1.5 text-sm bg-card border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="text-xs text-muted-foreground mb-1 block">Height</label>
+                  <input
+                    type="number"
+                    value={customHeight}
+                    onChange={e => handleHeightChange(Number(e.target.value))}
+                    min={100}
+                    max={8000}
+                    className="w-full px-2 py-1.5 text-sm bg-card border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Grid Size */}
