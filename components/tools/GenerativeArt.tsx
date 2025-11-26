@@ -1,15 +1,15 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { Download, RefreshCw, Shuffle } from 'lucide-react'
 import { Button, Card, Slider, Dropdown } from '@/components/ui'
+import ColorPaletteEditor from './generative/ColorPaletteEditor'
 import {
   generateArt,
   generateRandomSeed,
   PALETTES,
   CANVAS_SIZES,
   ART_STYLES,
-  type ColorPalette,
   type CanvasSize,
 } from '@/lib/utils/generative'
 
@@ -22,15 +22,27 @@ export default function GenerativeArt() {
   const [styleIndex, setStyleIndex] = useState(0)
   const [complexity, setComplexity] = useState(0.7)
   const [paletteIndex, setPaletteIndex] = useState(0)
+  const [customColors, setCustomColors] = useState<string[]>(PALETTES[0].colors)
+  const [customBackground, setCustomBackground] = useState(PALETTES[0].background)
+  const [isCustomPalette, setIsCustomPalette] = useState(false)
   const [canvasSizeIndex, setCanvasSizeIndex] = useState(4) // Square 1080x1080 default
   const [isGenerating, setIsGenerating] = useState(false)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const palette: ColorPalette = PALETTES[paletteIndex]
   const canvasSize: CanvasSize = CANVAS_SIZES[canvasSizeIndex]
   const style = ART_STYLES[styleIndex]
+
+  // Memoize the palette to prevent infinite re-renders
+  const currentPalette = useMemo(
+    () => ({
+      name: isCustomPalette ? 'Custom' : PALETTES[paletteIndex].name,
+      colors: customColors,
+      background: customBackground,
+    }),
+    [isCustomPalette, paletteIndex, customColors, customBackground]
+  )
 
   const generate = useCallback(() => {
     const canvas = canvasRef.current
@@ -45,24 +57,44 @@ export default function GenerativeArt() {
     requestAnimationFrame(() => {
       generateArt(canvas, {
         gridSize,
-        palette,
+        palette: currentPalette,
         seed,
         style: style.name,
         complexity,
       })
       setIsGenerating(false)
     })
-  }, [gridSize, palette, seed, style, canvasSize, complexity])
+  }, [gridSize, currentPalette, seed, style, canvasSize, complexity])
 
   // Generate on mount and when settings change
   useEffect(() => {
     generate()
   }, [generate])
 
+  // When selecting a preset palette, update custom colors
+  const handlePaletteSelect = (index: number) => {
+    setPaletteIndex(index)
+    setCustomColors(PALETTES[index].colors)
+    setCustomBackground(PALETTES[index].background)
+    setIsCustomPalette(false)
+  }
+
+  // When editing colors manually, mark as custom
+  const handleColorsChange = (colors: string[]) => {
+    setCustomColors(colors)
+    setIsCustomPalette(true)
+  }
+
+  const handleBackgroundChange = (color: string) => {
+    setCustomBackground(color)
+    setIsCustomPalette(true)
+  }
+
   const handleRandomizeAll = () => {
     setSeed(generateRandomSeed())
     setStyleIndex(Math.floor(Math.random() * ART_STYLES.length))
-    setPaletteIndex(Math.floor(Math.random() * PALETTES.length))
+    const newPaletteIndex = Math.floor(Math.random() * PALETTES.length)
+    handlePaletteSelect(newPaletteIndex)
     setGridSize(Math.floor(Math.random() * (GRID_SIZE_MAX - GRID_SIZE_MIN + 1)) + GRID_SIZE_MIN)
     setComplexity(0.4 + Math.random() * 0.5) // Keep between 40-90% for good results
   }
@@ -72,7 +104,8 @@ export default function GenerativeArt() {
   }
 
   const handleRandomizePalette = () => {
-    setPaletteIndex(Math.floor(Math.random() * PALETTES.length))
+    const newIndex = Math.floor(Math.random() * PALETTES.length)
+    handlePaletteSelect(newIndex)
   }
 
   const handleDownload = () => {
@@ -90,10 +123,13 @@ export default function GenerativeArt() {
     })
   }
 
-  const paletteOptions = PALETTES.map((p, i) => ({
-    value: String(i),
-    label: p.name,
-  }))
+  const paletteOptions = [
+    ...(isCustomPalette ? [{ value: 'custom', label: 'Custom' }] : []),
+    ...PALETTES.map((p, i) => ({
+      value: String(i),
+      label: p.name,
+    })),
+  ]
 
   const sizeOptions = CANVAS_SIZES.map((s, i) => ({
     value: String(i),
@@ -226,20 +262,22 @@ export default function GenerativeArt() {
                 </button>
               </div>
               <Dropdown
-                value={String(paletteIndex)}
-                onChange={value => setPaletteIndex(Number(value))}
+                value={isCustomPalette ? 'custom' : String(paletteIndex)}
+                onChange={value => {
+                  if (value !== 'custom') {
+                    handlePaletteSelect(Number(value))
+                  }
+                }}
                 options={paletteOptions}
                 size="sm"
               />
-              <div className="flex gap-1 mt-2">
-                {palette.colors.map((color, i) => (
-                  <div
-                    key={i}
-                    className="w-6 h-6 rounded border border-border"
-                    style={{ backgroundColor: color }}
-                    title={color}
-                  />
-                ))}
+              <div className="mt-2">
+                <ColorPaletteEditor
+                  colors={customColors}
+                  background={customBackground}
+                  onColorsChange={handleColorsChange}
+                  onBackgroundChange={handleBackgroundChange}
+                />
               </div>
             </div>
 
