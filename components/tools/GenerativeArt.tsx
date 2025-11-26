@@ -8,6 +8,7 @@ import {
   generateRandomSeed,
   PALETTES,
   CANVAS_SIZES,
+  ART_STYLES,
   type ColorPalette,
   type CanvasSize,
 } from '@/lib/utils/generative'
@@ -18,6 +19,7 @@ const GRID_SIZE_MAX = 20
 export default function GenerativeArt() {
   const [seed, setSeed] = useState(generateRandomSeed)
   const [gridSize, setGridSize] = useState(8)
+  const [styleIndex, setStyleIndex] = useState(0)
   const [complexity, setComplexity] = useState(0.7)
   const [paletteIndex, setPaletteIndex] = useState(0)
   const [canvasSizeIndex, setCanvasSizeIndex] = useState(4) // Square 1080x1080 default
@@ -28,6 +30,7 @@ export default function GenerativeArt() {
 
   const palette: ColorPalette = PALETTES[paletteIndex]
   const canvasSize: CanvasSize = CANVAS_SIZES[canvasSizeIndex]
+  const style = ART_STYLES[styleIndex]
 
   const generate = useCallback(() => {
     const canvas = canvasRef.current
@@ -44,18 +47,27 @@ export default function GenerativeArt() {
         gridSize,
         palette,
         seed,
+        style: style.name,
         complexity,
       })
       setIsGenerating(false)
     })
-  }, [gridSize, palette, seed, complexity, canvasSize])
+  }, [gridSize, palette, seed, style, canvasSize, complexity])
 
   // Generate on mount and when settings change
   useEffect(() => {
     generate()
   }, [generate])
 
-  const handleRandomize = () => {
+  const handleRandomizeAll = () => {
+    setSeed(generateRandomSeed())
+    setStyleIndex(Math.floor(Math.random() * ART_STYLES.length))
+    setPaletteIndex(Math.floor(Math.random() * PALETTES.length))
+    setGridSize(Math.floor(Math.random() * (GRID_SIZE_MAX - GRID_SIZE_MIN + 1)) + GRID_SIZE_MIN)
+    setComplexity(0.4 + Math.random() * 0.5) // Keep between 40-90% for good results
+  }
+
+  const handleRandomizeSeed = () => {
     setSeed(generateRandomSeed())
   }
 
@@ -88,6 +100,11 @@ export default function GenerativeArt() {
     label: s.name,
   }))
 
+  const styleOptions = ART_STYLES.map((s, i) => ({
+    value: String(i),
+    label: s.name,
+  }))
+
   return (
     <div className="w-full h-full flex flex-col gap-4">
       <div className="grid lg:grid-cols-3 gap-4 flex-1 min-h-0">
@@ -98,7 +115,7 @@ export default function GenerativeArt() {
               <h3 className="font-medium text-foreground">Preview</h3>
               <div className="flex items-center gap-2">
                 <Button
-                  onClick={handleRandomize}
+                  onClick={handleRandomizeAll}
                   variant="ghost"
                   size="sm"
                   className="flex items-center gap-2"
@@ -179,9 +196,20 @@ export default function GenerativeArt() {
               <Slider
                 value={complexity}
                 onChange={e => setComplexity(Number(e.target.value))}
-                min={0.1}
+                min={0}
                 max={1}
                 step={0.05}
+              />
+            </div>
+
+            {/* Style */}
+            <div>
+              <label className="text-sm font-medium mb-1.5 block text-foreground">Style</label>
+              <Dropdown
+                value={String(styleIndex)}
+                onChange={value => setStyleIndex(Number(value))}
+                options={styleOptions}
+                size="sm"
               />
             </div>
 
@@ -225,7 +253,7 @@ export default function GenerativeArt() {
                   onChange={e => setSeed(Number(e.target.value))}
                   className="flex-1 px-2.5 py-1.5 text-sm bg-card border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
                 />
-                <Button onClick={handleRandomize} variant="secondary" size="sm">
+                <Button onClick={handleRandomizeSeed} variant="secondary" size="sm">
                   <RefreshCw className="w-3.5 h-3.5" />
                 </Button>
               </div>
