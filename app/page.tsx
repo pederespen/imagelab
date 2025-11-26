@@ -16,6 +16,11 @@ const tools = [
     description: 'Extract colors from images in HEX, RGB, HSL, and more',
     href: '/colorpicker',
   },
+  {
+    name: 'Pixelator',
+    description: 'Convert images to pixel art with adjustable pixel size',
+    href: '/pixelator',
+  },
 ]
 
 export default function Home() {

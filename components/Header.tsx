@@ -49,6 +49,12 @@ export default function Header() {
             >
               Color Picker
             </Link>
+            <Link
+              href="/pixelator"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Pixelator
+            </Link>
 
             <button
               onClick={toggleTheme}
@@ -199,6 +205,13 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Color Picker
+              </Link>
+              <Link
+                href="/pixelator"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Pixelator
               </Link>
             </nav>
           </div>
