@@ -11,6 +11,11 @@ const tools = [
     description: 'Create memes with templates or your own images',
     href: '/meme',
   },
+  {
+    name: 'Color Picker',
+    description: 'Extract colors from images in HEX, RGB, HSL, and more',
+    href: '/colorpicker',
+  },
 ]
 
 export default function Home() {

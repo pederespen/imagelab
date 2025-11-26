@@ -43,6 +43,12 @@ export default function Header() {
             >
               Meme Generator
             </Link>
+            <Link
+              href="/colorpicker"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Color Picker
+            </Link>
 
             <button
               onClick={toggleTheme}
@@ -186,6 +192,13 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Meme Generator
+              </Link>
+              <Link
+                href="/colorpicker"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Color Picker
               </Link>
             </nav>
           </div>
