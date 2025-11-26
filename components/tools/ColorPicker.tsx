@@ -7,6 +7,7 @@ import {
   getAllColorFormats,
   formatColorString,
   getContrastTextColor,
+  rgbToHex,
   type ColorFormats,
 } from '@/lib/utils/color'
 
@@ -15,6 +16,7 @@ export default function ColorPicker() {
   const [selectedColor, setSelectedColor] = useState<ColorFormats | null>(null)
   const [cursorColor, setCursorColor] = useState<ColorFormats | null>(null)
   const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null)
+  const [surroundingPixels, setSurroundingPixels] = useState<string[][]>([])
   const [copiedFormat, setCopiedFormat] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
 
@@ -84,12 +86,13 @@ export default function ColorPicker() {
     setIsDragging(false)
   }, [])
 
-  const getColorAtPosition = (e: React.MouseEvent<HTMLDivElement>): ColorFormats | null => {
+  const getColorAtPosition = (
+    e: React.MouseEvent<HTMLDivElement>
+  ): { color: ColorFormats; grid: string[][] } | null => {
     const canvas = canvasRef.current
     const container = imageContainerRef.current
     if (!canvas || !container) return null
 
-    const rect = container.getBoundingClientRect()
     const img = container.querySelector('img')
     if (!img) return null
 
@@ -111,20 +114,42 @@ export default function ColorPicker() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return null
 
+    // Get center pixel
     const pixel = ctx.getImageData(canvasX, canvasY, 1, 1).data
-    return getAllColorFormats(pixel[0], pixel[1], pixel[2])
+    const color = getAllColorFormats(pixel[0], pixel[1], pixel[2])
+
+    // Get 3x3 grid of surrounding pixels
+    const grid: string[][] = []
+    for (let dy = -1; dy <= 1; dy++) {
+      const row: string[] = []
+      for (let dx = -1; dx <= 1; dx++) {
+        const px = Math.max(0, Math.min(canvas.width - 1, canvasX + dx))
+        const py = Math.max(0, Math.min(canvas.height - 1, canvasY + dy))
+        const p = ctx.getImageData(px, py, 1, 1).data
+        row.push(rgbToHex(p[0], p[1], p[2]))
+      }
+      grid.push(row)
+    }
+
+    return { color, grid }
   }
 
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const color = getColorAtPosition(e)
-    if (color) {
-      setSelectedColor(color)
+    const result = getColorAtPosition(e)
+    if (result) {
+      setSelectedColor(result.color)
     }
   }
 
   const handleImageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const color = getColorAtPosition(e)
-    setCursorColor(color)
+    const result = getColorAtPosition(e)
+    if (result) {
+      setCursorColor(result.color)
+      setSurroundingPixels(result.grid)
+    } else {
+      setCursorColor(null)
+      setSurroundingPixels([])
+    }
 
     const container = imageContainerRef.current
     if (container) {
@@ -136,6 +161,7 @@ export default function ColorPicker() {
   const handleImageMouseLeave = () => {
     setCursorColor(null)
     setCursorPosition(null)
+    setSurroundingPixels([])
   }
 
   const handleCopyColor = async (format: keyof ColorFormats, colors: ColorFormats) => {
@@ -148,124 +174,106 @@ export default function ColorPicker() {
   const colorFormats: (keyof ColorFormats)[] = ['hex', 'rgb', 'hsl', 'hsv', 'cmyk']
 
   return (
-    <div className="space-y-6">
+    <div className="w-full h-full flex flex-col gap-4">
       {/* Hidden canvas for pixel reading */}
       <canvas ref={canvasRef} className="hidden" />
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-4 flex-1 min-h-0">
         {/* Image area */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Pipette className="w-4 h-4" />
-                Click on image to pick a color
-              </CardTitle>
-            </CardHeader>
-            <div className="p-5 pt-0">
-              {!imageSrc ? (
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  onDrop={handleDrop}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  className={`
-                    border-2 border-dashed rounded-xl p-12 text-center cursor-pointer
-                    transition-all duration-200
-                    ${
-                      isDragging
-                        ? 'border-primary bg-primary/5 scale-[1.02]'
-                        : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                    }
-                  `}
-                >
-                  <Upload className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-lg font-medium text-foreground mb-2">
-                    Drop an image here or click to upload
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    You can also paste an image from clipboard (Ctrl/Cmd + V)
-                  </p>
-                </div>
-              ) : (
-                <div
-                  ref={imageContainerRef}
-                  onClick={handleImageClick}
-                  onMouseMove={handleImageMouseMove}
-                  onMouseLeave={handleImageMouseLeave}
-                  className="relative cursor-crosshair rounded-lg overflow-hidden"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={imageSrc}
-                    alt="Uploaded image"
-                    className="w-full h-auto max-h-[500px] object-contain mx-auto"
-                  />
+        <div className="lg:col-span-2 flex flex-col gap-2">
+          <div
+            onClick={!imageSrc ? () => fileInputRef.current?.click() : undefined}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            className={`
+              bg-muted rounded-lg overflow-hidden flex-1 flex items-center justify-center border-2 relative transition-all duration-200 min-h-[400px]
+              ${!imageSrc ? 'cursor-pointer' : ''}
+              ${isDragging ? 'border-primary border-dashed bg-primary/5' : 'border-border'}
+              ${!imageSrc && !isDragging ? 'border-dashed hover:border-primary/50' : ''}
+            `}
+          >
+            {!imageSrc ? (
+              <div className="text-center text-muted-foreground">
+                <Upload className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                <p className="text-sm font-medium">Drop an image here or click to upload</p>
+                <p className="text-xs mt-1.5 opacity-75">You can also paste from clipboard</p>
+              </div>
+            ) : (
+              <div
+                ref={imageContainerRef}
+                onClick={handleImageClick}
+                onMouseMove={handleImageMouseMove}
+                onMouseLeave={handleImageMouseLeave}
+                className="relative cursor-crosshair w-full h-full flex items-center justify-center p-4"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imageSrc}
+                  alt="Uploaded image"
+                  className="max-w-full max-h-full object-contain"
+                />
 
-                  {/* Cursor color preview */}
-                  {cursorColor && cursorPosition && (
-                    <div
-                      className="absolute pointer-events-none z-10"
-                      style={{
-                        left: cursorPosition.x + 15,
-                        top: cursorPosition.y + 15,
-                      }}
-                    >
-                      <div className="flex items-center gap-2 bg-popover border border-border rounded-lg shadow-lg p-2">
-                        <div
-                          className="w-8 h-8 rounded border border-border"
-                          style={{ backgroundColor: cursorColor.hex }}
-                        />
-                        <span className="text-xs font-mono text-foreground">
-                          {cursorColor.hex.toUpperCase()}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={e => e.target.files?.[0] && handleFileLoad(e.target.files[0])}
-                className="hidden"
-              />
-
-              {imageSrc && (
-                <div className="mt-4 flex gap-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
+                {/* Cursor color preview with pixel grid */}
+                {cursorColor && cursorPosition && surroundingPixels.length > 0 && (
+                  <div
+                    className="absolute pointer-events-none z-10"
+                    style={{
+                      left: cursorPosition.x + 15,
+                      top: cursorPosition.y + 15,
+                    }}
                   >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Change Image
-                  </Button>
-                </div>
-              )}
-            </div>
-          </Card>
+                    <div className="bg-popover border border-border rounded-md shadow-lg p-1.5">
+                      {/* 3x3 pixel grid */}
+                      <div className="grid grid-cols-3 gap-px bg-border/50 rounded-sm overflow-hidden">
+                        {surroundingPixels.map((row, rowIdx) =>
+                          row.map((hex, colIdx) => (
+                            <div
+                              key={`${rowIdx}-${colIdx}`}
+                              className={`w-7 h-7 ${
+                                rowIdx === 1 && colIdx === 1 ? 'ring-2 ring-red-500 ring-inset' : ''
+                              }`}
+                              style={{ backgroundColor: hex }}
+                            />
+                          ))
+                        )}
+                      </div>
+                      {/* Hex value */}
+                      <p className="text-xs font-mono text-foreground text-center mt-1">
+                        {cursorColor.hex.toUpperCase()}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={e => e.target.files?.[0] && handleFileLoad(e.target.files[0])}
+              className="hidden"
+            />
+          </div>
         </div>
 
         {/* Color details panel */}
-        <div className="space-y-6">
-          {/* Selected color */}
-          <Card>
-            <CardHeader>
+        <div>
+          <Card className="h-full flex flex-col">
+            <CardHeader className="pb-3">
               <CardTitle>Selected Color</CardTitle>
             </CardHeader>
-            <div className="p-5 pt-0">
+            <div className="p-5 pt-0 flex-1 flex flex-col">
               {selectedColor ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {/* Large color preview */}
                   <div
-                    className="w-full aspect-video rounded-lg border border-border flex items-center justify-center"
+                    className="w-full aspect-[16/9] rounded-lg border border-border flex items-center justify-center"
                     style={{ backgroundColor: selectedColor.hex }}
                   >
                     <span
-                      className={`text-xl font-mono font-bold ${
+                      className={`text-lg font-mono font-bold ${
                         getContrastTextColor(
                           selectedColor.rgb.r,
                           selectedColor.rgb.g,
@@ -280,27 +288,30 @@ export default function ColorPicker() {
                   </div>
 
                   {/* Color formats */}
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     {colorFormats.map(format => (
                       <div
                         key={format}
-                        className="flex items-center justify-between bg-muted rounded-lg px-3 py-2"
+                        className="flex items-center justify-between bg-muted rounded-lg px-2.5 py-1.5"
                       >
                         <div>
-                          <span className="text-xs text-muted-foreground uppercase">{format}</span>
-                          <p className="font-mono text-sm text-foreground">
+                          <span className="text-[10px] text-muted-foreground uppercase">
+                            {format}
+                          </span>
+                          <p className="font-mono text-xs text-foreground">
                             {formatColorString(format, selectedColor)}
                           </p>
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
+                          className="h-7 w-7 p-0"
                           onClick={() => handleCopyColor(format, selectedColor)}
                         >
                           {copiedFormat === `${format}-${selectedColor.hex}` ? (
-                            <Check className="w-4 h-4 text-success" />
+                            <Check className="w-3.5 h-3.5 text-success" />
                           ) : (
-                            <Copy className="w-4 h-4" />
+                            <Copy className="w-3.5 h-3.5" />
                           )}
                         </Button>
                       </div>
@@ -308,8 +319,7 @@ export default function ColorPicker() {
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Pipette className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                <div className="flex-1 flex items-center justify-center text-center text-muted-foreground">
                   <p className="text-sm">Click on the image to pick a color</p>
                 </div>
               )}

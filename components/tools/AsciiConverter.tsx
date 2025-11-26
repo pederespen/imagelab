@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Upload, Copy, Check, Download } from 'lucide-react'
 import {
   imageToAscii,
@@ -18,6 +18,7 @@ export default function AsciiConverter() {
   const [previewUrl, setPreviewUrl] = useState<string>('')
   const [fontSize, setFontSize] = useState<number>(8)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
 
   // GIF-specific state
   const [isGifFile, setIsGifFile] = useState<boolean>(false)
@@ -206,27 +207,33 @@ export default function AsciiConverter() {
     }
   }
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click()
-  }
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+
+    const file = e.dataTransfer.files[0]
+    if (file && file.type.startsWith('image/')) {
+      await handleFileLoad(file)
+    }
+  }, [])
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }, [])
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }, [])
 
   return (
     <div className="w-full h-full flex flex-col gap-4">
       {/* Controls Bar */}
       <div className="flex-shrink-0">
         <Card>
-          <div className="p-2">
-            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={handleUploadClick}
-                disabled={isProcessing}
-                className="inline-flex items-center justify-center"
-              >
-                <Upload className="w-3.5 h-3.5 mr-1.5" />
-                {isProcessing ? 'Loading...' : 'Upload'}
-              </Button>
+          <div className="p-2 min-h-[46px] flex items-center">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -235,10 +242,12 @@ export default function AsciiConverter() {
                 className="hidden"
               />
 
+              {!imageData && (
+                <p className="text-sm text-muted-foreground">Upload an image to get started</p>
+              )}
+
               {imageData && (
                 <>
-                  <div className="hidden sm:block h-6 w-px bg-border" />
-
                   <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
                     <span className="text-xs text-muted-foreground">Width:</span>
                     <div className="flex gap-1">
@@ -349,7 +358,18 @@ export default function AsciiConverter() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
         {/* Original Image */}
         <div className="flex flex-col gap-2">
-          <div className="bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border border-border p-2 relative">
+          <div
+            onClick={!previewUrl ? () => fileInputRef.current?.click() : undefined}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            className={`
+              bg-muted rounded-lg overflow-hidden aspect-square flex items-center justify-center border-2 p-2 relative transition-all duration-200
+              ${!previewUrl ? 'cursor-pointer' : ''}
+              ${isDragging ? 'border-primary border-dashed bg-primary/5' : 'border-border'}
+              ${!previewUrl && !isDragging ? 'border-dashed hover:border-primary/50' : ''}
+            `}
+          >
             {isProcessing && (
               <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10">
                 <div className="text-center">
@@ -368,11 +388,10 @@ export default function AsciiConverter() {
               )
             ) : (
               <div className="text-center text-muted-foreground">
-                <p className="text-sm">No image loaded</p>
-                <p className="text-xs mt-1">Upload or paste an image</p>
-                <p className="text-xs mt-1 opacity-75">
-                  (GIFs must be uploaded to preserve animation)
-                </p>
+                <Upload className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                <p className="text-sm font-medium">Drop an image here or click to upload</p>
+                <p className="text-xs mt-1.5 opacity-75">You can also paste from clipboard</p>
+                <p className="text-xs mt-1 opacity-50">(GIFs supported)</p>
               </div>
             )}
           </div>

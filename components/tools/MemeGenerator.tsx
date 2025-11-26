@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { Download, Copy, Check, Plus, Trash2, Save } from 'lucide-react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { Download, Copy, Check, Plus, Trash2, Save, Upload } from 'lucide-react'
 import { Button, Card, Dropdown, Slider } from '@/components/ui'
 import MemeTemplatePicker from '@/components/ui/MemeTemplatePicker'
 import { useTheme } from '@/components/ThemeProvider'
@@ -38,6 +38,7 @@ export default function MemeGenerator() {
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null)
   const [editedLayerIds, setEditedLayerIds] = useState<Set<string>>(new Set())
   const [isDragging, setIsDragging] = useState(false)
+  const [isFileDragging, setIsFileDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle')
   const [selectedTemplate, setSelectedTemplate] = useState<string>('')
@@ -281,6 +282,26 @@ export default function MemeGenerator() {
 
     await handleFileLoad(file)
   }
+
+  const handleFileDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsFileDragging(false)
+
+    const file = e.dataTransfer.files[0]
+    if (file && file.type.startsWith('image/')) {
+      await handleFileLoad(file)
+    }
+  }, [])
+
+  const handleFileDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsFileDragging(true)
+  }, [])
+
+  const handleFileDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsFileDragging(false)
+  }, [])
 
   const handleFileLoad = async (file: File) => {
     try {
@@ -672,7 +693,18 @@ export default function MemeGenerator() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
         {/* Canvas */}
         <div className="lg:col-span-2 flex flex-col gap-2 min-h-0">
-          <div className="bg-muted rounded-lg overflow-hidden flex-1 flex items-center justify-center border border-border min-h-[400px] relative">
+          <div
+            onClick={!baseImage ? () => fileInputRef.current?.click() : undefined}
+            onDrop={handleFileDrop}
+            onDragOver={handleFileDragOver}
+            onDragLeave={handleFileDragLeave}
+            className={`
+              bg-muted rounded-lg overflow-hidden flex-1 flex items-center justify-center border-2 min-h-[400px] relative transition-all duration-200
+              ${!baseImage ? 'cursor-pointer' : ''}
+              ${isFileDragging ? 'border-primary border-dashed bg-primary/5' : 'border-border'}
+              ${!baseImage && !isFileDragging ? 'border-dashed hover:border-primary/50' : ''}
+            `}
+          >
             <canvas
               ref={canvasRef}
               width={CANVAS_WIDTH}
@@ -686,11 +718,10 @@ export default function MemeGenerator() {
             {!baseImage && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="text-center text-muted-foreground px-4">
-                  <p className="text-sm">Select a preset or upload your own image to get started</p>
-                  <p className="text-xs mt-1 opacity-75">You can also paste an image</p>
-                  <p className="text-xs mt-1 opacity-75">
-                    (GIFs must be uploaded to preserve animation)
-                  </p>
+                  <Upload className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm font-medium">Drop an image here or click to upload</p>
+                  <p className="text-xs mt-1.5 opacity-75">Or select a preset template above</p>
+                  <p className="text-xs mt-1 opacity-50">(GIFs supported)</p>
                 </div>
               </div>
             )}
