@@ -21,6 +21,11 @@ const tools = [
     description: 'Convert images to pixel art with adjustable pixel size',
     href: '/pixelator',
   },
+  {
+    name: 'Generative Art',
+    description: 'Create Bauhaus-inspired geometric art with customizable palettes',
+    href: '/generative',
+  },
 ]
 
 export default function Home() {
