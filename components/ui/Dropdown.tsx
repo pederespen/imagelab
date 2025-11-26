@@ -29,7 +29,9 @@ export function Dropdown({
   size = 'md',
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [openAbove, setOpenAbove] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   const selectedOption = options.find(opt => opt.value === value)
 
@@ -57,6 +59,16 @@ export function Dropdown({
     }
   }, [isOpen])
 
+  const handleToggle = () => {
+    if (!isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      const spaceBelow = window.innerHeight - rect.bottom
+      const dropdownHeight = Math.min(options.length * 40, 240) // Estimate dropdown height
+      setOpenAbove(spaceBelow < dropdownHeight && rect.top > dropdownHeight)
+    }
+    setIsOpen(!isOpen)
+  }
+
   const handleSelect = (optionValue: string) => {
     onChange(optionValue)
     setIsOpen(false)
@@ -71,8 +83,9 @@ export function Dropdown({
       )}
 
       <button
+        ref={buttonRef}
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         className={`w-full pr-9 border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 bg-card text-foreground transition-all text-sm font-medium text-left relative cursor-pointer ${
           size === 'sm' ? 'px-3 py-1.5 text-xs' : 'px-3 py-2.5'
         } ${error ? 'border-red-400' : 'border-input hover:border-border'}`}
@@ -99,13 +112,17 @@ export function Dropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 left-0 right-0 bg-popover border border-card-border rounded-lg shadow-xl max-h-60 overflow-auto">
+        <div
+          className={`absolute z-50 left-0 right-0 bg-popover border border-card-border rounded-lg shadow-xl max-h-60 overflow-auto ${
+            openAbove ? 'bottom-full mb-1' : 'top-full mt-1'
+          }`}
+        >
           {options.map(option => (
             <button
               key={option.value}
               type="button"
               onClick={() => handleSelect(option.value)}
-              className={`w-full px-3 py-2.5 text-left text-sm transition-all cursor-pointer bg-popover ${
+              className={`w-full px-3 py-2 text-left text-sm transition-all cursor-pointer bg-popover ${
                 option.value === value
                   ? '!bg-primary/10 text-popover-foreground font-semibold border-l-2 border-primary'
                   : 'text-muted-foreground hover:bg-secondary hover:text-popover-foreground hover:pl-4'

@@ -2,6 +2,7 @@
 
 export * from './types'
 export * from './palettes'
+export * from './categories'
 import { SeededRandom, solidBlock, GenerativeSettings, TileDrawer } from './types'
 import { STYLE_PATTERNS, quarterCirclePatterns } from './styles'
 

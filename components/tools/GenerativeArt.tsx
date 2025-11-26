@@ -1,22 +1,28 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
-import { Download, RefreshCw, Shuffle } from 'lucide-react'
+import { Download, RefreshCw, Shuffle, ArrowLeft } from 'lucide-react'
 import { Button, Card, Slider, Dropdown } from '@/components/ui'
 import ColorPaletteEditor from './generative/ColorPaletteEditor'
+import StyleCard from './generative/StyleCard'
 import {
   generateArt,
   generateRandomSeed,
   PALETTES,
   CANVAS_SIZES,
   ART_STYLES,
-  type CanvasSize,
+  STYLE_CATEGORIES,
+  type StyleCategory,
 } from '@/lib/utils/generative'
 
 const GRID_SIZE_MIN = 4
 const GRID_SIZE_MAX = 20
 
 export default function GenerativeArt() {
+  // Style category selection (null = show picker)
+  const [selectedCategory, setSelectedCategory] = useState<StyleCategory | null>(null)
+
+  // Editor state
   const [seed, setSeed] = useState(generateRandomSeed)
   const [gridSize, setGridSize] = useState(8)
   const [styleIndex, setStyleIndex] = useState(0)
@@ -25,7 +31,7 @@ export default function GenerativeArt() {
   const [customColors, setCustomColors] = useState<string[]>(PALETTES[0].colors)
   const [customBackground, setCustomBackground] = useState(PALETTES[0].background)
   const [isCustomPalette, setIsCustomPalette] = useState(false)
-  const [canvasSizeIndex, setCanvasSizeIndex] = useState(4) // Square 1080x1080 default
+  const [canvasSizeIndex, setCanvasSizeIndex] = useState(4)
   const [customWidth, setCustomWidth] = useState(CANVAS_SIZES[4].width)
   const [customHeight, setCustomHeight] = useState(CANVAS_SIZES[4].height)
   const [isCustomSize, setIsCustomSize] = useState(false)
@@ -34,13 +40,11 @@ export default function GenerativeArt() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Use custom dimensions or preset
   const canvasSize = isCustomSize
     ? { name: 'Custom', width: customWidth, height: customHeight }
     : CANVAS_SIZES[canvasSizeIndex]
   const style = ART_STYLES[styleIndex]
 
-  // When selecting a preset, update custom dimensions
   const handleSizePresetChange = (index: number) => {
     setCanvasSizeIndex(index)
     setCustomWidth(CANVAS_SIZES[index].width)
@@ -48,7 +52,6 @@ export default function GenerativeArt() {
     setIsCustomSize(false)
   }
 
-  // When manually changing dimensions, mark as custom
   const handleWidthChange = (width: number) => {
     setCustomWidth(width)
     setIsCustomSize(true)
@@ -59,7 +62,6 @@ export default function GenerativeArt() {
     setIsCustomSize(true)
   }
 
-  // Memoize the palette to prevent infinite re-renders
   const currentPalette = useMemo(
     () => ({
       name: isCustomPalette ? 'Custom' : PALETTES[paletteIndex].name,
@@ -74,8 +76,6 @@ export default function GenerativeArt() {
     if (!canvas) return
 
     setIsGenerating(true)
-
-    // Set actual canvas size for high-res output
     canvas.width = canvasSize.width
     canvas.height = canvasSize.height
 
@@ -91,12 +91,12 @@ export default function GenerativeArt() {
     })
   }, [gridSize, currentPalette, seed, style, canvasSize, complexity])
 
-  // Generate on mount and when settings change
   useEffect(() => {
-    generate()
-  }, [generate])
+    if (selectedCategory) {
+      generate()
+    }
+  }, [generate, selectedCategory])
 
-  // When selecting a preset palette, update custom colors
   const handlePaletteSelect = (index: number) => {
     setPaletteIndex(index)
     setCustomColors(PALETTES[index].colors)
@@ -104,7 +104,6 @@ export default function GenerativeArt() {
     setIsCustomPalette(false)
   }
 
-  // When editing colors manually, mark as custom
   const handleColorsChange = (colors: string[]) => {
     setCustomColors(colors)
     setIsCustomPalette(true)
@@ -121,7 +120,7 @@ export default function GenerativeArt() {
     const newPaletteIndex = Math.floor(Math.random() * PALETTES.length)
     handlePaletteSelect(newPaletteIndex)
     setGridSize(Math.floor(Math.random() * (GRID_SIZE_MAX - GRID_SIZE_MIN + 1)) + GRID_SIZE_MIN)
-    setComplexity(0.4 + Math.random() * 0.5) // Keep between 40-90% for good results
+    setComplexity(0.4 + Math.random() * 0.5)
   }
 
   const handleRandomizeSeed = () => {
@@ -148,6 +147,16 @@ export default function GenerativeArt() {
     })
   }
 
+  const handleSelectCategory = (category: StyleCategory) => {
+    setSelectedCategory(category)
+    // Reset to defaults for the selected style
+    setSeed(generateRandomSeed())
+  }
+
+  const handleBackToStyles = () => {
+    setSelectedCategory(null)
+  }
+
   const paletteOptions = [
     ...(isCustomPalette ? [{ value: 'custom', label: 'Custom' }] : []),
     ...PALETTES.map((p, i) => ({
@@ -169,8 +178,62 @@ export default function GenerativeArt() {
     label: s.name,
   }))
 
+  // Style Picker View
+  if (!selectedCategory) {
+    return (
+      <div className="w-full h-full flex flex-col">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-foreground mb-2">Choose a Style</h2>
+          <p className="text-muted-foreground">Select an art style to start creating</p>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+          {STYLE_CATEGORIES.map(category => (
+            <StyleCard
+              key={category.id}
+              style={category}
+              isSelected={false}
+              onClick={() => handleSelectCategory(category)}
+            />
+          ))}
+
+          {/* Placeholder cards for coming soon styles */}
+          {['Art Deco', 'Memphis', 'Truchet'].map(name => (
+            <div
+              key={name}
+              className="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-border bg-muted/30 opacity-50 cursor-not-allowed"
+            >
+              <div className="w-[120px] h-[120px] rounded-lg bg-muted flex items-center justify-center">
+                <span className="text-3xl">🎨</span>
+              </div>
+              <div className="mt-3 text-center">
+                <h3 className="font-medium text-muted-foreground">{name}</h3>
+                <p className="text-sm text-muted-foreground mt-1">Coming soon</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // Editor View
   return (
     <div className="w-full h-full flex flex-col gap-4">
+      {/* Back button */}
+      <div className="flex items-center gap-3">
+        <Button
+          onClick={handleBackToStyles}
+          variant="ghost"
+          size="sm"
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Styles
+        </Button>
+        <h2 className="text-lg font-bold text-foreground">{selectedCategory.name}</h2>
+      </div>
+
       <div className="grid lg:grid-cols-3 gap-4 flex-1 min-h-0">
         {/* Canvas Area */}
         <div className="lg:col-span-2 flex flex-col gap-4 min-h-0">
@@ -262,50 +325,57 @@ export default function GenerativeArt() {
               </div>
             </div>
 
-            {/* Grid Size */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-sm font-medium text-foreground">Grid Size</label>
-                <span className="text-xs text-muted-foreground">{gridSize}</span>
-              </div>
-              <Slider
-                value={gridSize}
-                onChange={e => setGridSize(Number(e.target.value))}
-                min={GRID_SIZE_MIN}
-                max={GRID_SIZE_MAX}
-                step={1}
-              />
-            </div>
+            {/* Bauhaus-specific settings */}
+            {selectedCategory.id === 'bauhaus' && (
+              <>
+                {/* Grid Size */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-sm font-medium text-foreground">Grid Size</label>
+                    <span className="text-xs text-muted-foreground">{gridSize}</span>
+                  </div>
+                  <Slider
+                    value={gridSize}
+                    onChange={e => setGridSize(Number(e.target.value))}
+                    min={GRID_SIZE_MIN}
+                    max={GRID_SIZE_MAX}
+                    step={1}
+                  />
+                </div>
 
-            {/* Complexity */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-sm font-medium text-foreground">Complexity</label>
-                <span className="text-xs text-muted-foreground">
-                  {Math.round(complexity * 100)}%
-                </span>
-              </div>
-              <Slider
-                value={complexity}
-                onChange={e => setComplexity(Number(e.target.value))}
-                min={0}
-                max={1}
-                step={0.05}
-              />
-            </div>
+                {/* Complexity */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-sm font-medium text-foreground">Complexity</label>
+                    <span className="text-xs text-muted-foreground">
+                      {Math.round(complexity * 100)}%
+                    </span>
+                  </div>
+                  <Slider
+                    value={complexity}
+                    onChange={e => setComplexity(Number(e.target.value))}
+                    min={0}
+                    max={1}
+                    step={0.05}
+                  />
+                </div>
 
-            {/* Style */}
-            <div>
-              <label className="text-sm font-medium mb-1.5 block text-foreground">Style</label>
-              <Dropdown
-                value={String(styleIndex)}
-                onChange={value => setStyleIndex(Number(value))}
-                options={styleOptions}
-                size="sm"
-              />
-            </div>
+                {/* Style */}
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block text-foreground">
+                    Pattern
+                  </label>
+                  <Dropdown
+                    value={String(styleIndex)}
+                    onChange={value => setStyleIndex(Number(value))}
+                    options={styleOptions}
+                    size="sm"
+                  />
+                </div>
+              </>
+            )}
 
-            {/* Color Palette */}
+            {/* Color Palette - shared across styles */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-sm font-medium text-foreground">Palette</label>
@@ -337,7 +407,7 @@ export default function GenerativeArt() {
               </div>
             </div>
 
-            {/* Seed */}
+            {/* Seed - shared across styles */}
             <div>
               <label className="text-sm font-medium mb-1.5 block text-foreground">Seed</label>
               <div className="flex gap-2">
