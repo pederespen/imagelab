@@ -105,7 +105,7 @@ export default function GenerativeArt() {
                   disabled={isGenerating}
                 >
                   <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
-                  New Seed
+                  Generate
                 </Button>
                 <Button
                   onClick={handleDownload}
@@ -134,30 +134,30 @@ export default function GenerativeArt() {
         </div>
 
         {/* Controls */}
-        <Card className="flex flex-col gap-4">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <Card className="flex flex-col">
+          <div className="px-4 py-3 border-b border-border">
             <h3 className="font-medium text-foreground">Settings</h3>
           </div>
 
-          <div className="flex-1 px-4 pb-4 space-y-6 overflow-y-auto">
+          <div className="flex-1 px-4 py-4 space-y-4 overflow-y-auto">
             {/* Canvas Size */}
             <div>
-              <label className="text-sm font-medium mb-2 block text-foreground">Canvas Size</label>
+              <label className="text-sm font-medium mb-1.5 block text-foreground">
+                Canvas Size
+              </label>
               <Dropdown
                 value={String(canvasSizeIndex)}
                 onChange={value => setCanvasSizeIndex(Number(value))}
                 options={sizeOptions}
+                size="sm"
               />
-              <p className="text-xs text-muted-foreground mt-2">
-                {canvasSize.width} × {canvasSize.height} pixels
-              </p>
             </div>
 
             {/* Grid Size */}
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-1.5">
                 <label className="text-sm font-medium text-foreground">Grid Size</label>
-                <span className="text-sm text-muted-foreground">{gridSize} tiles</span>
+                <span className="text-xs text-muted-foreground">{gridSize}</span>
               </div>
               <Slider
                 value={gridSize}
@@ -166,14 +166,13 @@ export default function GenerativeArt() {
                 max={GRID_SIZE_MAX}
                 step={1}
               />
-              <p className="text-xs text-muted-foreground mt-2">Fewer tiles = larger shapes</p>
             </div>
 
             {/* Complexity */}
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-1.5">
                 <label className="text-sm font-medium text-foreground">Complexity</label>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   {Math.round(complexity * 100)}%
                 </span>
               </div>
@@ -184,70 +183,52 @@ export default function GenerativeArt() {
                 max={1}
                 step={0.05}
               />
-              <p className="text-xs text-muted-foreground mt-2">Lower = simpler patterns</p>
             </div>
 
             {/* Color Palette */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-foreground">Color Palette</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-sm font-medium text-foreground">Palette</label>
                 <button
                   onClick={handleRandomizePalette}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                   title="Random palette"
                 >
-                  <Shuffle className="w-4 h-4" />
+                  <Shuffle className="w-3.5 h-3.5" />
                 </button>
               </div>
               <Dropdown
                 value={String(paletteIndex)}
                 onChange={value => setPaletteIndex(Number(value))}
                 options={paletteOptions}
+                size="sm"
               />
-              {/* Color swatches */}
-              <div className="flex gap-1.5 mt-3">
+              <div className="flex gap-1 mt-2">
                 {palette.colors.map((color, i) => (
                   <div
                     key={i}
-                    className="w-8 h-8 rounded-md border border-border shadow-sm"
+                    className="w-6 h-6 rounded border border-border"
                     style={{ backgroundColor: color }}
                     title={color}
                   />
                 ))}
               </div>
-              <p className="text-xs text-muted-foreground mt-2">Background: {palette.background}</p>
             </div>
 
             {/* Seed */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-foreground">Seed</label>
-                <span className="text-sm text-muted-foreground font-mono">{seed}</span>
-              </div>
+              <label className="text-sm font-medium mb-1.5 block text-foreground">Seed</label>
               <div className="flex gap-2">
                 <input
                   type="number"
                   value={seed}
                   onChange={e => setSeed(Number(e.target.value))}
-                  className="flex-1 px-3 py-2 text-sm bg-card border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
+                  className="flex-1 px-2.5 py-1.5 text-sm bg-card border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
                 />
-                <Button onClick={handleRandomize} variant="secondary" size="md">
-                  <RefreshCw className="w-4 h-4" />
+                <Button onClick={handleRandomize} variant="secondary" size="sm">
+                  <RefreshCw className="w-3.5 h-3.5" />
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">Same seed = same artwork</p>
-            </div>
-
-            {/* Actions */}
-            <div className="pt-4 border-t border-border space-y-3">
-              <Button onClick={handleDownload} variant="primary" fullWidth>
-                <Download className="w-4 h-4 mr-2" />
-                Download PNG
-              </Button>
-              <Button onClick={handleRandomize} variant="secondary" fullWidth>
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Generate New
-              </Button>
             </div>
           </div>
         </Card>

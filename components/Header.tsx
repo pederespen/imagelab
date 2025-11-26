@@ -55,6 +55,12 @@ export default function Header() {
             >
               Pixelator
             </Link>
+            <Link
+              href="/generative"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Generative Art
+            </Link>
 
             <button
               onClick={toggleTheme}
@@ -212,6 +218,13 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pixelator
+              </Link>
+              <Link
+                href="/generative"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Generative Art
               </Link>
             </nav>
           </div>

@@ -185,15 +185,27 @@ export default function Pixelator() {
             <Card className="flex-1 flex flex-col min-h-0">
               <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                 <h3 className="font-medium text-foreground">Pixelated Image</h3>
-                <Button
-                  onClick={handleChangeImage}
-                  variant="ghost"
-                  size="sm"
-                  className="flex items-center gap-2"
-                >
-                  <Upload className="w-4 h-4" />
-                  Change Image
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={handleChangeImage}
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Change Image
+                  </Button>
+                  <Button
+                    onClick={handleDownload}
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center gap-2"
+                    disabled={isProcessing}
+                  >
+                    <Download className="w-4 h-4" />
+                    Download
+                  </Button>
+                </div>
               </div>
               <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
                 <canvas ref={displayCanvasRef} className="max-w-full max-h-full object-contain" />
@@ -222,18 +234,6 @@ export default function Pixelator() {
         <Card className="flex flex-col gap-4">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h3 className="font-medium text-foreground">Settings</h3>
-            {imageSrc && (
-              <Button
-                onClick={handleDownload}
-                variant="ghost"
-                size="sm"
-                className="flex items-center gap-2"
-                disabled={isProcessing}
-              >
-                <Download className="w-4 h-4" />
-                Download
-              </Button>
-            )}
           </div>
 
           {imageSrc ? (
