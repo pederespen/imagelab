@@ -63,9 +63,13 @@ export default function GenerativeArt() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const canvasSize = isCustomSize
-    ? { name: 'Custom', width: customWidth, height: customHeight }
-    : CANVAS_SIZES[canvasSizeIndex]
+  const canvasSize = useMemo(
+    () =>
+      isCustomSize
+        ? { name: 'Custom', width: customWidth, height: customHeight }
+        : CANVAS_SIZES[canvasSizeIndex],
+    [isCustomSize, customWidth, customHeight, canvasSizeIndex]
+  )
 
   // Get patterns for current category
   const categoryPatterns = selectedCategory ? CATEGORY_PATTERNS[selectedCategory.id] || [] : []

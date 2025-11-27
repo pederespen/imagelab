@@ -18,68 +18,6 @@ export default function Pixelator() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Load image to source canvas
-  useEffect(() => {
-    if (!imageSrc || !sourceCanvasRef.current) return
-
-    const img = new Image()
-    img.onload = () => {
-      const canvas = sourceCanvasRef.current
-      if (!canvas) return
-
-      canvas.width = img.width
-      canvas.height = img.height
-      const ctx = canvas.getContext('2d')
-      if (ctx) {
-        ctx.drawImage(img, 0, 0)
-        processImage()
-      }
-    }
-    img.src = imageSrc
-  }, [imageSrc])
-
-  // Debounced processing when pixel size changes
-  useEffect(() => {
-    if (!sourceCanvasRef.current || !imageSrc) return
-
-    // Clear any pending processing
-    if (processingTimeoutRef.current) {
-      clearTimeout(processingTimeoutRef.current)
-    }
-
-    // Debounce the processing by 100ms
-    processingTimeoutRef.current = setTimeout(() => {
-      processImage()
-    }, 100)
-
-    return () => {
-      if (processingTimeoutRef.current) {
-        clearTimeout(processingTimeoutRef.current)
-      }
-    }
-  }, [pixelSize, colorDepth, colorPalette, imageSrc])
-
-  // Handle paste events
-  useEffect(() => {
-    const handlePaste = (e: ClipboardEvent) => {
-      const items = e.clipboardData?.items
-      if (!items) return
-
-      for (const item of items) {
-        if (item.type.startsWith('image/')) {
-          const file = item.getAsFile()
-          if (file) {
-            handleFileSelect(file)
-          }
-          break
-        }
-      }
-    }
-
-    window.addEventListener('paste', handlePaste)
-    return () => window.removeEventListener('paste', handlePaste)
-  }, [])
-
   const processImage = useCallback(() => {
     const sourceCanvas = sourceCanvasRef.current
     const displayCanvas = displayCanvasRef.current
@@ -110,6 +48,68 @@ export default function Pixelator() {
       }
     })
   }, [pixelSize, colorDepth, colorPalette])
+
+  // Load image to source canvas
+  useEffect(() => {
+    if (!imageSrc || !sourceCanvasRef.current) return
+
+    const img = new Image()
+    img.onload = () => {
+      const canvas = sourceCanvasRef.current
+      if (!canvas) return
+
+      canvas.width = img.width
+      canvas.height = img.height
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.drawImage(img, 0, 0)
+        processImage()
+      }
+    }
+    img.src = imageSrc
+  }, [imageSrc, processImage])
+
+  // Debounced processing when pixel size changes
+  useEffect(() => {
+    if (!sourceCanvasRef.current || !imageSrc) return
+
+    // Clear any pending processing
+    if (processingTimeoutRef.current) {
+      clearTimeout(processingTimeoutRef.current)
+    }
+
+    // Debounce the processing by 100ms
+    processingTimeoutRef.current = setTimeout(() => {
+      processImage()
+    }, 100)
+
+    return () => {
+      if (processingTimeoutRef.current) {
+        clearTimeout(processingTimeoutRef.current)
+      }
+    }
+  }, [pixelSize, colorDepth, colorPalette, imageSrc, processImage])
+
+  // Handle paste events
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items
+      if (!items) return
+
+      for (const item of items) {
+        if (item.type.startsWith('image/')) {
+          const file = item.getAsFile()
+          if (file) {
+            handleFileSelect(file)
+          }
+          break
+        }
+      }
+    }
+
+    window.addEventListener('paste', handlePaste)
+    return () => window.removeEventListener('paste', handlePaste)
+  }, [])
 
   const handleFileSelect = async (file: File) => {
     if (!file.type.startsWith('image/')) {

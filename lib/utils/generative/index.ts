@@ -3,7 +3,7 @@
 export * from './types'
 export * from './palettes'
 export * from './categories'
-import { SeededRandom, solidBlock, GenerativeSettings, TileDrawer } from './types'
+import { SeededRandom, solidBlock, GenerativeSettings } from './types'
 import { STYLE_PATTERNS, quarterCirclePatterns, generateLayers, LAYER_STYLES } from './styles'
 
 // Styles that should always fill every tile (no solid block gaps)

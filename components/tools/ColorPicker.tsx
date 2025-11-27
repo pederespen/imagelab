@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Upload, Copy, Check, Pipette } from 'lucide-react'
+import { Upload, Copy, Check } from 'lucide-react'
 import { Button, Card, CardHeader, CardTitle } from '@/components/ui'
 import {
   getAllColorFormats,
