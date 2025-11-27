@@ -19,6 +19,7 @@ const PREVIEW_IMAGES: Record<string, string> = {
   flowfield: '/generative-previews/preview-flowfields.png',
   voronoi: '/generative-previews/preview-voronoi.png',
   tessellation: '/generative-previews/preview-tessellations.png',
+  gradient: '/generative-previews/preview-gradient.png',
 }
 
 export default function StyleCard({ style, isSelected, onClick }: StyleCardProps) {

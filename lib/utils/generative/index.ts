@@ -17,6 +17,8 @@ import {
   VORONOI_STYLES,
   generateTessellation,
   TESSELLATION_STYLES,
+  generateGradientMesh,
+  GRADIENT_MESH_STYLES,
 } from './styles'
 
 // Styles that should always fill every tile (no solid block gaps)
@@ -143,6 +145,27 @@ export function generateArt(canvas: HTMLCanvasElement, settings: GenerativeSetti
     generateTessellation(ctx, canvas.width, canvas.height, {
       ...settings,
       variant: variantMap[style] || 'islamic-stars',
+    })
+    return
+  }
+
+  // Check if this is a gradient mesh style (non-tile-based)
+  if (GRADIENT_MESH_STYLES.includes(style)) {
+    const variantMap: Record<
+      string,
+      'soft-mesh' | 'lava' | 'plasma' | 'orbs' | 'spotlight' | 'silk'
+    > = {
+      'Soft Mesh': 'soft-mesh',
+      Lava: 'lava',
+      Plasma: 'plasma',
+      Orbs: 'orbs',
+      Spotlight: 'spotlight',
+      Silk: 'silk',
+    }
+
+    generateGradientMesh(ctx, canvas.width, canvas.height, {
+      ...settings,
+      variant: variantMap[style] || 'soft-mesh',
     })
     return
   }

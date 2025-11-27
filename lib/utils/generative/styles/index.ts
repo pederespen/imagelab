@@ -17,6 +17,7 @@ import { generateContour } from './contour'
 import { generateFlowField, FLOW_FIELD_STYLES } from './flow-fields'
 import { generateVoronoi, VORONOI_STYLES } from './voronoi'
 import { generateTessellation, TESSELLATION_STYLES } from './tessellation'
+import { generateGradientMesh, GRADIENT_MESH_STYLES } from './gradient-mesh'
 
 export const STYLE_PATTERNS: Record<string, TileDrawer[]> = {
   // Bauhaus styles
@@ -76,4 +77,6 @@ export {
   VORONOI_STYLES,
   generateTessellation,
   TESSELLATION_STYLES,
+  generateGradientMesh,
+  GRADIENT_MESH_STYLES,
 }

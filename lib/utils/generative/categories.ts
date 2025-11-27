@@ -52,4 +52,10 @@ export const STYLE_CATEGORIES: StyleCategory[] = [
     description: 'Geometric repeating patterns like Islamic stars and tiles',
     previewColors: ['#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#FFFFFF'],
   },
+  {
+    id: 'gradient',
+    name: 'Gradient Mesh',
+    description: 'Smooth flowing color gradients with organic blending',
+    previewColors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96E6A1', '#DDA0DD'],
+  },
 ]

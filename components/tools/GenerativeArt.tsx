@@ -72,6 +72,14 @@ const CATEGORY_PATTERNS: Record<string, { name: string; description: string }[]>
     { name: 'Basketweave', description: 'Woven strip pattern' },
     { name: 'Penrose', description: 'Aperiodic rhombus tiling' },
   ],
+  gradient: [
+    { name: 'Soft Mesh', description: 'Smooth blending gradient blobs' },
+    { name: 'Lava', description: 'Blobby merging metaball gradients' },
+    { name: 'Plasma', description: 'Psychedelic sine-wave patterns' },
+    { name: 'Orbs', description: 'Overlapping soft radial gradients' },
+    { name: 'Spotlight', description: 'Dramatic edge lighting effects' },
+    { name: 'Silk', description: 'Flowing curved gradient ribbons' },
+  ],
 }
 
 const GRID_SIZE_MIN = 4
@@ -379,21 +387,26 @@ export default function GenerativeArt() {
             </div>
 
             {/* Grid Size - only for tile-based styles */}
-            {selectedCategory?.id !== 'terrain' && selectedCategory?.id !== 'contour' && (
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-sm font-medium text-foreground">Grid Size</label>
-                  <span className="text-xs text-muted-foreground">{gridSize}</span>
+            {selectedCategory?.id !== 'terrain' &&
+              selectedCategory?.id !== 'contour' &&
+              selectedCategory?.id !== 'gradient' &&
+              selectedCategory?.id !== 'flowfield' &&
+              selectedCategory?.id !== 'voronoi' &&
+              selectedCategory?.id !== 'tessellation' && (
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-sm font-medium text-foreground">Grid Size</label>
+                    <span className="text-xs text-muted-foreground">{gridSize}</span>
+                  </div>
+                  <Slider
+                    value={gridSize}
+                    onChange={e => setGridSize(Number(e.target.value))}
+                    min={GRID_SIZE_MIN}
+                    max={GRID_SIZE_MAX}
+                    step={1}
+                  />
                 </div>
-                <Slider
-                  value={gridSize}
-                  onChange={e => setGridSize(Number(e.target.value))}
-                  min={GRID_SIZE_MIN}
-                  max={GRID_SIZE_MAX}
-                  step={1}
-                />
-              </div>
-            )}
+              )}
 
             {/* Complexity/Line Thickness/Waviness - label depends on style */}
             <div>
