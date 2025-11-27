@@ -53,10 +53,6 @@ export default function Home() {
             </Link>
           ))}
         </div>
-
-        <footer className="text-center mt-16 text-muted-foreground">
-          <p>Built with Next.js, TypeScript, and Tailwind CSS</p>
-        </footer>
       </div>
     </main>
   )
