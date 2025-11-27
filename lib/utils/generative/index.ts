@@ -4,7 +4,14 @@ export * from './types'
 export * from './palettes'
 export * from './categories'
 import { SeededRandom, solidBlock, GenerativeSettings } from './types'
-import { STYLE_PATTERNS, quarterCirclePatterns, generateTerrain, TERRAIN_STYLES } from './styles'
+import {
+  STYLE_PATTERNS,
+  quarterCirclePatterns,
+  generateTerrain,
+  TERRAIN_STYLES,
+  generateContour,
+  CONTOUR_STYLES,
+} from './styles'
 
 // Styles that should always fill every tile (no solid block gaps)
 const CONTINUOUS_STYLES = [
@@ -45,6 +52,28 @@ export function generateArt(canvas: HTMLCanvasElement, settings: GenerativeSetti
       seed,
       complexity,
       variant: variantMap[style] || 'mountains',
+    })
+    return
+  }
+
+  // Check if this is a contour-style pattern (non-tile-based)
+  if (CONTOUR_STYLES.includes(style)) {
+    const variantMap: Record<
+      string,
+      'topographic' | 'elevation' | 'islands' | 'ridges' | 'thermal' | 'sound-waves' | 'magnetic'
+    > = {
+      Topographic: 'topographic',
+      Elevation: 'elevation',
+      Islands: 'islands',
+      Ridges: 'ridges',
+      Thermal: 'thermal',
+      'Sound Waves': 'sound-waves',
+      Magnetic: 'magnetic',
+    }
+
+    generateContour(ctx, canvas.width, canvas.height, {
+      ...settings,
+      variant: variantMap[style] || 'topographic',
     })
     return
   }

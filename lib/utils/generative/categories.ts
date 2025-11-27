@@ -28,4 +28,10 @@ export const STYLE_CATEGORIES: StyleCategory[] = [
     description: 'Smooth wavy mountain silhouettes with gradient depth',
     previewColors: ['#FFA07A', '#E85D4C', '#C74B50', '#8B3A62', '#4A235A'],
   },
+  {
+    id: 'contour',
+    name: 'Contour',
+    description: 'Topographic-style contour lines and elevation maps',
+    previewColors: ['#264653', '#2A9D8F', '#E9C46A', '#F4A261', '#E76F51'],
+  },
 ]

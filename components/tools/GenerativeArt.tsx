@@ -39,6 +39,15 @@ const CATEGORY_PATTERNS: Record<string, { name: string; description: string }[]>
     { name: 'Aurora', description: 'Night sky with northern lights' },
     { name: 'Reflection', description: 'Mountains reflected in water' },
   ],
+  contour: [
+    { name: 'Topographic', description: 'Classic terrain contour lines' },
+    { name: 'Elevation', description: 'Filled elevation bands with contours' },
+    { name: 'Islands', description: 'Multiple peak archipelago map' },
+    { name: 'Ridges', description: 'Sharp mountain ridge formations' },
+    { name: 'Thermal', description: 'Heat map with gradient intensity' },
+    { name: 'Sound Waves', description: 'Circular wave interference patterns' },
+    { name: 'Magnetic', description: 'Magnetic field potential lines' },
+  ],
 }
 
 const GRID_SIZE_MIN = 4
@@ -346,7 +355,7 @@ export default function GenerativeArt() {
             </div>
 
             {/* Grid Size - only for tile-based styles */}
-            {selectedCategory?.id !== 'terrain' && (
+            {selectedCategory?.id !== 'terrain' && selectedCategory?.id !== 'contour' && (
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-sm font-medium text-foreground">Grid Size</label>
@@ -370,7 +379,9 @@ export default function GenerativeArt() {
                     ? 'Line Thickness'
                     : selectedCategory?.id === 'terrain'
                       ? 'Waviness'
-                      : 'Complexity'}
+                      : selectedCategory?.id === 'contour'
+                        ? 'Detail'
+                        : 'Complexity'}
                 </label>
                 <span className="text-xs text-muted-foreground">
                   {Math.round(complexity * 100)}%

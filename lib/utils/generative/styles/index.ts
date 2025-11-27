@@ -13,6 +13,7 @@ import {
   truchetTrianglePatterns,
 } from './truchet'
 import { generateTerrain, terrainPatternNames } from './layers'
+import { generateContour } from './contour'
 
 export const STYLE_PATTERNS: Record<string, TileDrawer[]> = {
   // Bauhaus styles
@@ -41,6 +42,16 @@ export const TERRAIN_STYLES = [
   'Reflection',
 ]
 
+export const CONTOUR_STYLES = [
+  'Topographic',
+  'Elevation',
+  'Islands',
+  'Ridges',
+  'Thermal',
+  'Sound Waves',
+  'Magnetic',
+]
+
 export {
   quarterCirclePatterns,
   concentricPatterns,
@@ -55,4 +66,5 @@ export {
   truchetTrianglePatterns,
   generateTerrain,
   terrainPatternNames,
+  generateContour,
 }

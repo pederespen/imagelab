@@ -88,6 +88,8 @@ export default function StyleCard({ style, isSelected, onClick }: StyleCardProps
           }
         } else if (style.id === 'terrain') {
           // Skip tile rendering for terrain - handle separately below
+        } else if (style.id === 'contour') {
+          // Skip tile rendering for contour - handle separately below
         }
       }
     }
@@ -125,6 +127,71 @@ export default function StyleCard({ style, isSelected, onClick }: StyleCardProps
         ctx.lineTo(0, size)
         ctx.closePath()
         ctx.fill()
+      }
+    }
+
+    // Special rendering for contour style (topographic lines)
+    if (style.id === 'contour') {
+      // Background
+      ctx.fillStyle = colors[colors.length - 1] || '#F5F5F5'
+      ctx.fillRect(0, 0, size, size)
+
+      // Draw concentric contour lines with organic wobble
+      const centerX = size * 0.45
+      const centerY = size * 0.5
+      const numContours = 6
+
+      ctx.lineWidth = 2
+      ctx.lineCap = 'round'
+
+      for (let i = numContours; i >= 1; i--) {
+        const baseRadius = (i / numContours) * size * 0.42
+        ctx.strokeStyle = colors[i % colors.length]
+        ctx.beginPath()
+
+        for (let angle = 0; angle <= Math.PI * 2; angle += 0.1) {
+          // Add organic wobble to radius
+          const wobble = Math.sin(angle * 3 + i) * baseRadius * 0.15
+          const radius = baseRadius + wobble
+          const x = centerX + Math.cos(angle) * radius
+          const y = centerY + Math.sin(angle) * radius
+
+          if (angle === 0) {
+            ctx.moveTo(x, y)
+          } else {
+            ctx.lineTo(x, y)
+          }
+        }
+
+        ctx.closePath()
+        ctx.stroke()
+      }
+
+      // Add a second cluster for more interest
+      const centerX2 = size * 0.75
+      const centerY2 = size * 0.35
+      const numContours2 = 4
+
+      for (let i = numContours2; i >= 1; i--) {
+        const baseRadius = (i / numContours2) * size * 0.25
+        ctx.strokeStyle = colors[(i + 2) % colors.length]
+        ctx.beginPath()
+
+        for (let angle = 0; angle <= Math.PI * 2; angle += 0.1) {
+          const wobble = Math.sin(angle * 4 + i * 2) * baseRadius * 0.2
+          const radius = baseRadius + wobble
+          const x = centerX2 + Math.cos(angle) * radius
+          const y = centerY2 + Math.sin(angle) * radius
+
+          if (angle === 0) {
+            ctx.moveTo(x, y)
+          } else {
+            ctx.lineTo(x, y)
+          }
+        }
+
+        ctx.closePath()
+        ctx.stroke()
       }
     }
   }, [style])
