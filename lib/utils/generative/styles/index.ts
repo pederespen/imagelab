@@ -16,6 +16,7 @@ import { generateTerrain, terrainPatternNames } from './layers'
 import { generateContour } from './contour'
 import { generateFlowField, FLOW_FIELD_STYLES } from './flow-fields'
 import { generateVoronoi, VORONOI_STYLES } from './voronoi'
+import { generateTessellation, TESSELLATION_STYLES } from './tessellation'
 
 export const STYLE_PATTERNS: Record<string, TileDrawer[]> = {
   // Bauhaus styles
@@ -73,4 +74,6 @@ export {
   FLOW_FIELD_STYLES,
   generateVoronoi,
   VORONOI_STYLES,
+  generateTessellation,
+  TESSELLATION_STYLES,
 }

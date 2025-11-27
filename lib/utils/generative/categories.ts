@@ -46,4 +46,10 @@ export const STYLE_CATEGORIES: StyleCategory[] = [
     description: 'Cellular patterns with organic, crystalline regions',
     previewColors: ['#06B6D4', '#8B5CF6', '#F59E0B', '#10B981', '#1E293B'],
   },
+  {
+    id: 'tessellation',
+    name: 'Tessellations',
+    description: 'Geometric repeating patterns like Islamic stars and tiles',
+    previewColors: ['#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#FFFFFF'],
+  },
 ]

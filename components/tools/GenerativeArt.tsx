@@ -64,6 +64,14 @@ const CATEGORY_PATTERNS: Record<string, { name: string; description: string }[]>
     { name: 'Honeycomb', description: 'Regular hexagonal grid' },
     { name: 'Crystals', description: 'Gradient-filled gemstone cells' },
   ],
+  tessellation: [
+    { name: 'Islamic Stars', description: '8-pointed star pattern' },
+    { name: 'Herringbone', description: 'Interlocking angled bricks' },
+    { name: 'Hexagons', description: 'Hexagonal tile grid' },
+    { name: 'Triangles', description: 'Triangular tessellation' },
+    { name: 'Basketweave', description: 'Woven strip pattern' },
+    { name: 'Penrose', description: 'Aperiodic rhombus tiling' },
+  ],
 }
 
 const GRID_SIZE_MIN = 4

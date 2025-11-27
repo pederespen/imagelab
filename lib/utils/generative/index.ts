@@ -15,6 +15,8 @@ import {
   FLOW_FIELD_STYLES,
   generateVoronoi,
   VORONOI_STYLES,
+  generateTessellation,
+  TESSELLATION_STYLES,
 } from './styles'
 
 // Styles that should always fill every tile (no solid block gaps)
@@ -120,6 +122,27 @@ export function generateArt(canvas: HTMLCanvasElement, settings: GenerativeSetti
     generateVoronoi(ctx, canvas.width, canvas.height, {
       ...settings,
       variant: variantMap[style] || 'cells',
+    })
+    return
+  }
+
+  // Check if this is a tessellation style (non-tile-based)
+  if (TESSELLATION_STYLES.includes(style)) {
+    const variantMap: Record<
+      string,
+      'islamic-stars' | 'herringbone' | 'hexagons' | 'triangles' | 'basketweave' | 'penrose'
+    > = {
+      'Islamic Stars': 'islamic-stars',
+      Herringbone: 'herringbone',
+      Hexagons: 'hexagons',
+      Triangles: 'triangles',
+      Basketweave: 'basketweave',
+      Penrose: 'penrose',
+    }
+
+    generateTessellation(ctx, canvas.width, canvas.height, {
+      ...settings,
+      variant: variantMap[style] || 'islamic-stars',
     })
     return
   }
