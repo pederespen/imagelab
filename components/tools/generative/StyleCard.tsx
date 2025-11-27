@@ -42,26 +42,30 @@ export default function StyleCard({ style, isSelected, onClick }: StyleCardProps
       )}
 
       {/* Preview image */}
-      {previewSrc ? (
-        <Image
-          src={previewSrc}
-          alt={`${style.name} preview`}
-          width={120}
-          height={120}
-          className="rounded-lg shadow-sm object-cover"
-        />
-      ) : (
-        <div className="w-[120px] h-[120px] rounded-lg shadow-sm bg-muted flex items-center justify-center">
-          <span className="text-muted-foreground text-sm">No preview</span>
+      <div className="relative">
+        {previewSrc ? (
+          <Image
+            src={previewSrc}
+            alt={`${style.name} preview`}
+            width={120}
+            height={120}
+            className="rounded-lg shadow-sm object-cover"
+          />
+        ) : (
+          <div className="w-[120px] h-[120px] rounded-lg shadow-sm bg-muted flex items-center justify-center">
+            <span className="text-muted-foreground text-sm">No preview</span>
+          </div>
+        )}
+
+        {/* Description overlay on hover */}
+        <div className="absolute inset-0 rounded-lg bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center p-2">
+          <p className="text-xs text-white text-center leading-snug">{style.description}</p>
         </div>
-      )}
+      </div>
 
       {/* Style info */}
       <div className="mt-3 text-center">
         <h3 className="font-medium text-foreground">{style.name}</h3>
-        <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-all duration-200">
-          <p className="text-sm text-muted-foreground mt-1 overflow-hidden">{style.description}</p>
-        </div>
       </div>
     </button>
   )

@@ -295,9 +295,9 @@ export default function GenerativeArt() {
         <h2 className="text-lg font-bold text-foreground">{selectedCategory.name}</h2>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-4 flex-1 min-h-0">
+      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 flex-1 min-h-0">
         {/* Canvas Area */}
-        <div className="lg:col-span-2 flex flex-col gap-4 min-h-0">
+        <div className="lg:col-span-2 flex flex-col gap-4 min-h-[300px] lg:min-h-0">
           <Card className="flex-1 flex flex-col min-h-0">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <h3 className="font-medium text-foreground">Preview</h3>
@@ -339,7 +339,7 @@ export default function GenerativeArt() {
         </div>
 
         {/* Controls */}
-        <Card className="flex flex-col">
+        <Card className="flex flex-col max-h-[400px] lg:max-h-none">
           <div className="px-4 py-3 border-b border-border">
             <h3 className="font-medium text-foreground">Settings</h3>
           </div>
