@@ -13,7 +13,6 @@ import {
   truchetOutlinedPatterns,
   truchetDiagonalPatterns,
   truchetTrianglePatterns,
-  truchetWeavePatterns,
 } from './truchet'
 
 export const STYLE_PATTERNS: Record<string, TileDrawer[]> = {
@@ -34,7 +33,6 @@ export const STYLE_PATTERNS: Record<string, TileDrawer[]> = {
   'Outlined Pipes': truchetOutlinedPatterns,
   'Diagonal Lines': truchetDiagonalPatterns,
   Triangles: truchetTrianglePatterns,
-  Weave: truchetWeavePatterns,
 }
 
 export {
@@ -51,5 +49,4 @@ export {
   truchetOutlinedPatterns,
   truchetDiagonalPatterns,
   truchetTrianglePatterns,
-  truchetWeavePatterns,
 }

@@ -27,12 +27,10 @@ const CATEGORY_PATTERNS: Record<string, { name: string; description: string }[]>
   'art-deco': [{ name: 'Art Deco', description: 'Fans, sunbursts and geometric motifs' }],
   memphis: [{ name: 'Memphis', description: 'Squiggles, dots and bold shapes' }],
   truchet: [
-    { name: 'Truchet', description: 'Random mix of all patterns' },
     { name: 'Curved Pipes', description: 'Smooth flowing connected curves' },
     { name: 'Outlined Pipes', description: 'Curves with outline effect' },
     { name: 'Diagonal Lines', description: 'Maze-like diagonal patterns' },
     { name: 'Triangles', description: 'Geometric triangle tiles' },
-    { name: 'Weave', description: 'Organic flowing strokes' },
   ],
 }
 
@@ -351,10 +349,12 @@ export default function GenerativeArt() {
               />
             </div>
 
-            {/* Complexity - shared across all styles */}
+            {/* Complexity/Line Thickness - label depends on style */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-sm font-medium text-foreground">Complexity</label>
+                <label className="text-sm font-medium text-foreground">
+                  {selectedCategory?.id === 'truchet' ? 'Line Thickness' : 'Complexity'}
+                </label>
                 <span className="text-xs text-muted-foreground">
                   {Math.round(complexity * 100)}%
                 </span>

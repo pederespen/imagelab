@@ -13,7 +13,6 @@ const CONTINUOUS_STYLES = [
   'Outlined Pipes',
   'Diagonal Lines',
   'Triangles',
-  'Weave',
 ]
 
 export function generateArt(canvas: HTMLCanvasElement, settings: GenerativeSettings): void {
@@ -50,12 +49,12 @@ export function generateArt(canvas: HTMLCanvasElement, settings: GenerativeSetti
       if (isContinuous) {
         // Always draw a pattern for continuous styles
         const pattern = rng.pick(stylePatterns)
-        pattern(ctx, x, y, cellSize, palette.colors, rng)
+        pattern(ctx, x, y, cellSize, palette.colors, rng, complexity)
       } else {
         // Use complexity to determine if we draw a pattern or solid block
         if (rng.next() < complexity) {
           const pattern = rng.pick(stylePatterns)
-          pattern(ctx, x, y, cellSize, palette.colors, rng)
+          pattern(ctx, x, y, cellSize, palette.colors, rng, complexity)
         } else {
           solidBlock(ctx, x, y, cellSize, palette.colors, rng)
         }

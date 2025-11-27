@@ -58,7 +58,8 @@ export type TileDrawer = (
   y: number,
   size: number,
   colors: string[],
-  rng: SeededRandom
+  rng: SeededRandom,
+  complexity?: number
 ) => void
 
 // Solid block pattern - shared across all styles

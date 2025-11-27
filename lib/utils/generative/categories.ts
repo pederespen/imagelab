@@ -17,6 +17,12 @@ export const STYLE_CATEGORIES: StyleCategory[] = [
     previewColors: ['#E53935', '#FDD835', '#1E88E5', '#212121'],
   },
   {
+    id: 'truchet',
+    name: 'Truchet',
+    description: 'Interlocking curved tiles creating flowing maze patterns',
+    previewColors: ['#2D3436', '#DFE6E9', '#0984E3', '#74B9FF'],
+  },
+  {
     id: 'art-deco',
     name: 'Art Deco',
     description: 'Elegant patterns with fans, sunbursts and gold accents',
@@ -27,11 +33,5 @@ export const STYLE_CATEGORIES: StyleCategory[] = [
     name: 'Memphis',
     description: 'Bold 80s style with squiggles, dots and geometric shapes',
     previewColors: ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3'],
-  },
-  {
-    id: 'truchet',
-    name: 'Truchet',
-    description: 'Interlocking curved tiles creating flowing maze patterns',
-    previewColors: ['#2D3436', '#DFE6E9', '#0984E3', '#74B9FF'],
   },
 ]
