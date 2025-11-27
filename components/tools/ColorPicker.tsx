@@ -180,14 +180,14 @@ export default function ColorPicker() {
 
       <div className="grid lg:grid-cols-3 gap-4 flex-1 min-h-0">
         {/* Image area */}
-        <div className="lg:col-span-2 flex flex-col gap-2">
+        <div className="lg:col-span-2 flex flex-col gap-2 min-h-0">
           <div
             onClick={!imageSrc ? () => fileInputRef.current?.click() : undefined}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             className={`
-              bg-muted rounded-lg overflow-hidden flex-1 flex items-center justify-center border-2 relative transition-all duration-200 min-h-[400px]
+              bg-muted rounded-lg overflow-auto flex-1 flex items-center justify-center border-2 relative transition-all duration-200 min-h-[400px]
               ${!imageSrc ? 'cursor-pointer' : ''}
               ${isDragging ? 'border-primary border-dashed bg-primary/5' : 'border-border'}
               ${!imageSrc && !isDragging ? 'border-dashed hover:border-primary/50' : ''}
@@ -305,13 +305,13 @@ export default function ColorPicker() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 w-7 p-0"
+                          className="!p-0 h-7 w-7 flex items-center justify-center"
                           onClick={() => handleCopyColor(format, selectedColor)}
                         >
                           {copiedFormat === `${format}-${selectedColor.hex}` ? (
-                            <Check className="w-3.5 h-3.5 text-success" />
+                            <Check className="w-4 h-4 text-success" />
                           ) : (
-                            <Copy className="w-3.5 h-3.5" />
+                            <Copy className="w-4 h-4" />
                           )}
                         </Button>
                       </div>

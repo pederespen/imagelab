@@ -22,7 +22,7 @@ export const PALETTES: ColorPalette[] = [
     background: '#F1FAEE',
   },
   {
-    name: 'Sunset',
+    name: 'Rainbow',
     colors: ['#FF6B6B', '#FEC89A', '#FFD93D', '#6BCB77', '#4D96FF'],
     background: '#FFF8E7',
   },
@@ -40,6 +40,11 @@ export const PALETTES: ColorPalette[] = [
     name: 'Nordic',
     colors: ['#5E81AC', '#81A1C1', '#88C0D0', '#8FBCBB', '#2E3440'],
     background: '#ECEFF4',
+  },
+  {
+    name: 'Sunset',
+    colors: ['#F5E828', '#F6AA7C', '#EE6B51', '#D94853', '#A23852'],
+    background: '#FFF9E6',
   },
 ]
 

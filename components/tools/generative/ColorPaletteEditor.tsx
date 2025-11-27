@@ -11,7 +11,7 @@ interface ColorPaletteEditorProps {
 }
 
 const MIN_COLORS = 2
-const MAX_COLORS = 8
+const MAX_COLORS = 6
 
 export default function ColorPaletteEditor({
   colors,
