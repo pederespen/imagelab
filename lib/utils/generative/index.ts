@@ -4,7 +4,7 @@ export * from './types'
 export * from './palettes'
 export * from './categories'
 import { SeededRandom, solidBlock, GenerativeSettings, TileDrawer } from './types'
-import { STYLE_PATTERNS, quarterCirclePatterns } from './styles'
+import { STYLE_PATTERNS, quarterCirclePatterns, generateLayers, LAYER_STYLES } from './styles'
 
 // Styles that should always fill every tile (no solid block gaps)
 const CONTINUOUS_STYLES = [
@@ -20,6 +20,30 @@ export function generateArt(canvas: HTMLCanvasElement, settings: GenerativeSetti
   if (!ctx) return
 
   const { gridSize, palette, seed, style, complexity } = settings
+
+  // Check if this is a layers-style pattern (non-tile-based)
+  if (LAYER_STYLES.includes(style)) {
+    // Map style name to variant
+    const variantMap: Record<string, 'mountains' | 'mountains-no-sun' | 'dunes' | 'waves'> = {
+      Mountains: 'mountains',
+      'Mountains (No Sun)': 'mountains-no-sun',
+      Dunes: 'dunes',
+      Waves: 'waves',
+    }
+
+    generateLayers({
+      canvas,
+      ctx,
+      colors: palette.colors,
+      background: palette.background,
+      seed,
+      complexity,
+      variant: variantMap[style] || 'mountains',
+    })
+    return
+  }
+
+  // Tile-based rendering for other styles
   const rng = new SeededRandom(seed)
 
   // Calculate cell size based on canvas dimensions and grid

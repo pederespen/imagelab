@@ -86,7 +86,45 @@ export default function StyleCard({ style, isSelected, onClick }: StyleCardProps
             ctx.arc(x, y + cellSize, cellSize / 2, Math.PI * 1.5, Math.PI * 2)
             ctx.stroke()
           }
+        } else if (style.id === 'terrain') {
+          // Skip tile rendering for terrain - handle separately below
         }
+      }
+    }
+
+    // Special rendering for terrain style (non-tile-based)
+    if (style.id === 'terrain') {
+      // Draw gradient background
+      const gradient = ctx.createLinearGradient(0, 0, 0, size)
+      gradient.addColorStop(0, colors[colors.length - 1]) // Lightest at top
+      gradient.addColorStop(1, colors[Math.floor(colors.length / 2)])
+      ctx.fillStyle = gradient
+      ctx.fillRect(0, 0, size, size)
+
+      // Draw sun
+      ctx.fillStyle = '#FFE066'
+      ctx.beginPath()
+      ctx.arc(size * 0.6, size * 0.2, size * 0.1, 0, Math.PI * 2)
+      ctx.fill()
+
+      // Draw wavy layers
+      const numLayers = Math.min(colors.length, 4)
+      for (let i = 0; i < numLayers; i++) {
+        const baseY = size * (0.35 + i * 0.18)
+        ctx.fillStyle = colors[i]
+        ctx.beginPath()
+        ctx.moveTo(0, baseY + Math.sin(0) * size * 0.03)
+
+        // Simple wave
+        for (let px = 0; px <= size; px += 2) {
+          const wave = Math.sin((px / size) * Math.PI * 2 + i * 1.5) * size * 0.04
+          ctx.lineTo(px, baseY + wave)
+        }
+
+        ctx.lineTo(size, size)
+        ctx.lineTo(0, size)
+        ctx.closePath()
+        ctx.fill()
       }
     }
   }, [style])

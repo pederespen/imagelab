@@ -12,6 +12,7 @@ import {
   truchetDiagonalPatterns,
   truchetTrianglePatterns,
 } from './truchet'
+import { generateLayers, layersPatternNames } from './layers'
 
 export const STYLE_PATTERNS: Record<string, TileDrawer[]> = {
   // Bauhaus styles
@@ -29,6 +30,9 @@ export const STYLE_PATTERNS: Record<string, TileDrawer[]> = {
   Triangles: truchetTrianglePatterns,
 }
 
+// Non-tile-based styles (full canvas rendering)
+export const LAYER_STYLES = ['Mountains', 'Mountains (No Sun)', 'Dunes', 'Waves']
+
 export {
   quarterCirclePatterns,
   concentricPatterns,
@@ -41,4 +45,6 @@ export {
   truchetOutlinedPatterns,
   truchetDiagonalPatterns,
   truchetTrianglePatterns,
+  generateLayers,
+  layersPatternNames,
 }

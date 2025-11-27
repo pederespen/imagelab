@@ -30,6 +30,12 @@ const CATEGORY_PATTERNS: Record<string, { name: string; description: string }[]>
     { name: 'Diagonal Lines', description: 'Maze-like diagonal patterns' },
     { name: 'Triangles', description: 'Geometric triangle tiles' },
   ],
+  terrain: [
+    { name: 'Mountains', description: 'Classic layered peaks with sun' },
+    { name: 'Mountains (No Sun)', description: 'Layered peaks, no sun' },
+    { name: 'Dunes', description: 'Gentle rolling desert dunes' },
+    { name: 'Waves', description: 'Flowing ocean-like waves' },
+  ],
 }
 
 const GRID_SIZE_MIN = 4
@@ -332,26 +338,32 @@ export default function GenerativeArt() {
               </div>
             </div>
 
-            {/* Grid Size - shared across all styles */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-sm font-medium text-foreground">Grid Size</label>
-                <span className="text-xs text-muted-foreground">{gridSize}</span>
+            {/* Grid Size - only for tile-based styles */}
+            {selectedCategory?.id !== 'terrain' && (
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-sm font-medium text-foreground">Grid Size</label>
+                  <span className="text-xs text-muted-foreground">{gridSize}</span>
+                </div>
+                <Slider
+                  value={gridSize}
+                  onChange={e => setGridSize(Number(e.target.value))}
+                  min={GRID_SIZE_MIN}
+                  max={GRID_SIZE_MAX}
+                  step={1}
+                />
               </div>
-              <Slider
-                value={gridSize}
-                onChange={e => setGridSize(Number(e.target.value))}
-                min={GRID_SIZE_MIN}
-                max={GRID_SIZE_MAX}
-                step={1}
-              />
-            </div>
+            )}
 
-            {/* Complexity/Line Thickness - label depends on style */}
+            {/* Complexity/Line Thickness/Waviness - label depends on style */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-sm font-medium text-foreground">
-                  {selectedCategory?.id === 'truchet' ? 'Line Thickness' : 'Complexity'}
+                  {selectedCategory?.id === 'truchet'
+                    ? 'Line Thickness'
+                    : selectedCategory?.id === 'terrain'
+                      ? 'Waviness'
+                      : 'Complexity'}
                 </label>
                 <span className="text-xs text-muted-foreground">
                   {Math.round(complexity * 100)}%

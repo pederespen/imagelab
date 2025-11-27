@@ -22,4 +22,10 @@ export const STYLE_CATEGORIES: StyleCategory[] = [
     description: 'Interlocking curved tiles creating flowing maze patterns',
     previewColors: ['#2D3436', '#DFE6E9', '#0984E3', '#74B9FF'],
   },
+  {
+    id: 'terrain',
+    name: 'Terrain',
+    description: 'Smooth wavy mountain silhouettes with gradient depth',
+    previewColors: ['#FFA07A', '#E85D4C', '#C74B50', '#8B3A62', '#4A235A'],
+  },
 ]
