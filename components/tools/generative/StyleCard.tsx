@@ -62,61 +62,6 @@ export default function StyleCard({ style, isSelected, onClick }: StyleCardProps
           }
           ctx.closePath()
           ctx.fill()
-        } else if (style.id === 'art-deco') {
-          // Fan/sunburst pattern
-          const cx = (row + col) % 2 === 0 ? x : x + cellSize
-          const cy = (row + col) % 2 === 0 ? y + cellSize : y
-          const startAngle = (row + col) % 2 === 0 ? Math.PI * 1.5 : Math.PI / 2
-
-          const rays = 4
-          const angleSpan = Math.PI / 2
-          const rayAngle = angleSpan / (rays * 2)
-
-          for (let i = 0; i < rays; i++) {
-            const angle = startAngle + rayAngle * (i * 2 + 0.5)
-            ctx.beginPath()
-            ctx.moveTo(cx, cy)
-            ctx.arc(cx, cy, cellSize * 0.9, angle, angle + rayAngle)
-            ctx.closePath()
-            ctx.fill()
-          }
-        } else if (style.id === 'memphis') {
-          // Mix of shapes
-          const shape = (row * 3 + col) % 4
-          if (shape === 0) {
-            // Circle
-            ctx.beginPath()
-            ctx.arc(x + cellSize / 2, y + cellSize / 2, cellSize * 0.3, 0, Math.PI * 2)
-            ctx.fill()
-          } else if (shape === 1) {
-            // Triangle
-            ctx.beginPath()
-            ctx.moveTo(x + cellSize / 2, y + cellSize * 0.2)
-            ctx.lineTo(x + cellSize * 0.8, y + cellSize * 0.8)
-            ctx.lineTo(x + cellSize * 0.2, y + cellSize * 0.8)
-            ctx.closePath()
-            ctx.fill()
-          } else if (shape === 2) {
-            // Cross
-            const t = cellSize * 0.15
-            ctx.fillRect(x + cellSize / 2 - t / 2, y + cellSize * 0.2, t, cellSize * 0.6)
-            ctx.fillRect(x + cellSize * 0.2, y + cellSize / 2 - t / 2, cellSize * 0.6, t)
-          } else {
-            // Squiggle line
-            ctx.strokeStyle = nextColor
-            ctx.lineWidth = cellSize * 0.08
-            ctx.beginPath()
-            ctx.moveTo(x + cellSize * 0.2, y + cellSize * 0.5)
-            ctx.bezierCurveTo(
-              x + cellSize * 0.4,
-              y + cellSize * 0.2,
-              x + cellSize * 0.6,
-              y + cellSize * 0.8,
-              x + cellSize * 0.8,
-              y + cellSize * 0.5
-            )
-            ctx.stroke()
-          }
         } else if (style.id === 'truchet') {
           // Curved truchet tiles - stroked arcs that connect
           ctx.strokeStyle = nextColor

@@ -5,8 +5,6 @@ import { shadowBlockPatterns } from './shadow-blocks'
 import { mondrianPatterns } from './mondrian'
 import { diamondPatterns } from './diamonds'
 import { circlePatterns } from './circles'
-import { artDecoPatterns } from './art-deco'
-import { memphisPatterns } from './memphis'
 import {
   truchetPatterns,
   truchetCurvedPatterns,
@@ -23,10 +21,6 @@ export const STYLE_PATTERNS: Record<string, TileDrawer[]> = {
   Mondrian: mondrianPatterns,
   Diamonds: diamondPatterns,
   Circles: circlePatterns,
-  // Art Deco styles
-  'Art Deco': artDecoPatterns,
-  // Memphis styles
-  Memphis: memphisPatterns,
   // Truchet styles
   Truchet: truchetPatterns,
   'Curved Pipes': truchetCurvedPatterns,
@@ -42,8 +36,6 @@ export {
   mondrianPatterns,
   diamondPatterns,
   circlePatterns,
-  artDecoPatterns,
-  memphisPatterns,
   truchetPatterns,
   truchetCurvedPatterns,
   truchetOutlinedPatterns,

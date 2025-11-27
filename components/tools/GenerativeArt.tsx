@@ -24,8 +24,6 @@ const CATEGORY_PATTERNS: Record<string, { name: string; description: string }[]>
     { name: 'Diamonds', description: 'Rotated squares and triangles' },
     { name: 'Circles', description: 'Overlapping circular forms' },
   ],
-  'art-deco': [{ name: 'Art Deco', description: 'Fans, sunbursts and geometric motifs' }],
-  memphis: [{ name: 'Memphis', description: 'Squiggles, dots and bold shapes' }],
   truchet: [
     { name: 'Curved Pipes', description: 'Smooth flowing connected curves' },
     { name: 'Outlined Pipes', description: 'Curves with outline effect' },
