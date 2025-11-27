@@ -11,6 +11,8 @@ import {
   TERRAIN_STYLES,
   generateContour,
   CONTOUR_STYLES,
+  generateFlowField,
+  FLOW_FIELD_STYLES,
 } from './styles'
 
 // Styles that should always fill every tile (no solid block gaps)
@@ -74,6 +76,27 @@ export function generateArt(canvas: HTMLCanvasElement, settings: GenerativeSetti
     generateContour(ctx, canvas.width, canvas.height, {
       ...settings,
       variant: variantMap[style] || 'topographic',
+    })
+    return
+  }
+
+  // Check if this is a flow field style (non-tile-based)
+  if (FLOW_FIELD_STYLES.includes(style)) {
+    const variantMap: Record<
+      string,
+      'streamlines' | 'particle-trails' | 'curl' | 'spiral' | 'converge' | 'turbulent'
+    > = {
+      Streamlines: 'streamlines',
+      'Particle Trails': 'particle-trails',
+      'Curl Noise': 'curl',
+      Spiral: 'spiral',
+      Converge: 'converge',
+      Turbulent: 'turbulent',
+    }
+
+    generateFlowField(ctx, canvas.width, canvas.height, {
+      ...settings,
+      variant: variantMap[style] || 'streamlines',
     })
     return
   }

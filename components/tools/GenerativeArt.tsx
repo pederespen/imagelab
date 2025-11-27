@@ -48,6 +48,14 @@ const CATEGORY_PATTERNS: Record<string, { name: string; description: string }[]>
     { name: 'Sound Waves', description: 'Circular wave interference patterns' },
     { name: 'Magnetic', description: 'Magnetic field potential lines' },
   ],
+  flowfield: [
+    { name: 'Streamlines', description: 'Smooth flowing lines following noise' },
+    { name: 'Particle Trails', description: 'Fading dots along flow paths' },
+    { name: 'Curl Noise', description: 'Curling, looping flow patterns' },
+    { name: 'Spiral', description: 'Spiraling outward from center' },
+    { name: 'Converge', description: 'Lines drawn to attractor points' },
+    { name: 'Turbulent', description: 'Chaotic high-frequency turbulence' },
+  ],
 }
 
 const GRID_SIZE_MIN = 4

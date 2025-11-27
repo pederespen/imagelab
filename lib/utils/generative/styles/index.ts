@@ -14,6 +14,7 @@ import {
 } from './truchet'
 import { generateTerrain, terrainPatternNames } from './layers'
 import { generateContour } from './contour'
+import { generateFlowField, FLOW_FIELD_STYLES } from './flow-fields'
 
 export const STYLE_PATTERNS: Record<string, TileDrawer[]> = {
   // Bauhaus styles
@@ -67,4 +68,6 @@ export {
   generateTerrain,
   terrainPatternNames,
   generateContour,
+  generateFlowField,
+  FLOW_FIELD_STYLES,
 }

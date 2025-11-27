@@ -34,4 +34,10 @@ export const STYLE_CATEGORIES: StyleCategory[] = [
     description: 'Topographic-style contour lines and elevation maps',
     previewColors: ['#264653', '#2A9D8F', '#E9C46A', '#F4A261', '#E76F51'],
   },
+  {
+    id: 'flowfield',
+    name: 'Flow Fields',
+    description: 'Organic particle trails following vector noise fields',
+    previewColors: ['#6366F1', '#8B5CF6', '#EC4899', '#F43F5E', '#0F172A'],
+  },
 ]
