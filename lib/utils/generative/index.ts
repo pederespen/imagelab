@@ -13,6 +13,8 @@ import {
   CONTOUR_STYLES,
   generateFlowField,
   FLOW_FIELD_STYLES,
+  generateVoronoi,
+  VORONOI_STYLES,
 } from './styles'
 
 // Styles that should always fill every tile (no solid block gaps)
@@ -97,6 +99,27 @@ export function generateArt(canvas: HTMLCanvasElement, settings: GenerativeSetti
     generateFlowField(ctx, canvas.width, canvas.height, {
       ...settings,
       variant: variantMap[style] || 'streamlines',
+    })
+    return
+  }
+
+  // Check if this is a voronoi style (non-tile-based)
+  if (VORONOI_STYLES.includes(style)) {
+    const variantMap: Record<
+      string,
+      'cells' | 'stained-glass' | 'mosaic' | 'cracked' | 'honeycomb' | 'crystals'
+    > = {
+      Cells: 'cells',
+      'Stained Glass': 'stained-glass',
+      Mosaic: 'mosaic',
+      Cracked: 'cracked',
+      Honeycomb: 'honeycomb',
+      Crystals: 'crystals',
+    }
+
+    generateVoronoi(ctx, canvas.width, canvas.height, {
+      ...settings,
+      variant: variantMap[style] || 'cells',
     })
     return
   }

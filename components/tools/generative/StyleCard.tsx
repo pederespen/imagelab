@@ -17,6 +17,7 @@ const PREVIEW_IMAGES: Record<string, string> = {
   terrain: '/generative-previews/preview-terrain.png',
   contour: '/generative-previews/preview-contour.png',
   flowfield: '/generative-previews/preview-flowfields.png',
+  voronoi: '/generative-previews/preview-voronoi.png',
 }
 
 export default function StyleCard({ style, isSelected, onClick }: StyleCardProps) {

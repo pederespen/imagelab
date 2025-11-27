@@ -56,6 +56,14 @@ const CATEGORY_PATTERNS: Record<string, { name: string; description: string }[]>
     { name: 'Converge', description: 'Lines drawn to attractor points' },
     { name: 'Turbulent', description: 'Chaotic high-frequency turbulence' },
   ],
+  voronoi: [
+    { name: 'Cells', description: 'Basic filled Voronoi cells' },
+    { name: 'Stained Glass', description: 'Cells with dark borders' },
+    { name: 'Mosaic', description: 'Shaded cells with gaps' },
+    { name: 'Cracked', description: 'Dried earth crack pattern' },
+    { name: 'Honeycomb', description: 'Regular hexagonal grid' },
+    { name: 'Crystals', description: 'Gradient-filled gemstone cells' },
+  ],
 }
 
 const GRID_SIZE_MIN = 4

@@ -40,4 +40,10 @@ export const STYLE_CATEGORIES: StyleCategory[] = [
     description: 'Organic particle trails following vector noise fields',
     previewColors: ['#6366F1', '#8B5CF6', '#EC4899', '#F43F5E', '#0F172A'],
   },
+  {
+    id: 'voronoi',
+    name: 'Voronoi',
+    description: 'Cellular patterns with organic, crystalline regions',
+    previewColors: ['#06B6D4', '#8B5CF6', '#F59E0B', '#10B981', '#1E293B'],
+  },
 ]
