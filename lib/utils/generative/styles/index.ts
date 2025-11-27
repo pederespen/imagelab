@@ -12,7 +12,7 @@ import {
   truchetDiagonalPatterns,
   truchetTrianglePatterns,
 } from './truchet'
-import { generateLayers, layersPatternNames } from './layers'
+import { generateTerrain, terrainPatternNames } from './layers'
 
 export const STYLE_PATTERNS: Record<string, TileDrawer[]> = {
   // Bauhaus styles
@@ -31,7 +31,15 @@ export const STYLE_PATTERNS: Record<string, TileDrawer[]> = {
 }
 
 // Non-tile-based styles (full canvas rendering)
-export const LAYER_STYLES = ['Mountains', 'Mountains (No Sun)', 'Dunes', 'Waves']
+export const TERRAIN_STYLES = [
+  'Mountains',
+  'Mountains (No Sun)',
+  'Dunes',
+  'Waves',
+  'Peaks',
+  'Aurora',
+  'Reflection',
+]
 
 export {
   quarterCirclePatterns,
@@ -45,6 +53,6 @@ export {
   truchetOutlinedPatterns,
   truchetDiagonalPatterns,
   truchetTrianglePatterns,
-  generateLayers,
-  layersPatternNames,
+  generateTerrain,
+  terrainPatternNames,
 }

@@ -35,6 +35,9 @@ const CATEGORY_PATTERNS: Record<string, { name: string; description: string }[]>
     { name: 'Mountains (No Sun)', description: 'Layered peaks, no sun' },
     { name: 'Dunes', description: 'Gentle rolling desert dunes' },
     { name: 'Waves', description: 'Flowing ocean-like waves' },
+    { name: 'Peaks', description: 'Jagged rocky mountain peaks' },
+    { name: 'Aurora', description: 'Night sky with northern lights' },
+    { name: 'Reflection', description: 'Mountains reflected in water' },
   ],
 }
 
