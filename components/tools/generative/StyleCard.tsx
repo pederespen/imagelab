@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { Check } from 'lucide-react'
 import { StyleCategory } from '@/lib/utils/generative'
 
@@ -10,16 +9,19 @@ interface StyleCardProps {
   onClick: () => void
 }
 
+// Base path for production deployment
+const basePath = process.env.NODE_ENV === 'production' ? '/imagelab' : ''
+
 // Map style IDs to preview image paths
 const PREVIEW_IMAGES: Record<string, string> = {
-  bauhaus: '/generative-previews/preview-bauhaus.png',
-  truchet: '/generative-previews/preview-truchet.png',
-  terrain: '/generative-previews/preview-terrain.png',
-  contour: '/generative-previews/preview-contour.png',
-  flowfield: '/generative-previews/preview-flowfields.png',
-  voronoi: '/generative-previews/preview-voronoi.png',
-  tessellation: '/generative-previews/preview-tessellations.png',
-  gradient: '/generative-previews/preview-gradient.png',
+  bauhaus: `${basePath}/generative-previews/preview-bauhaus.png`,
+  truchet: `${basePath}/generative-previews/preview-truchet.png`,
+  terrain: `${basePath}/generative-previews/preview-terrain.png`,
+  contour: `${basePath}/generative-previews/preview-contour.png`,
+  flowfield: `${basePath}/generative-previews/preview-flowfields.png`,
+  voronoi: `${basePath}/generative-previews/preview-voronoi.png`,
+  tessellation: `${basePath}/generative-previews/preview-tessellations.png`,
+  gradient: `${basePath}/generative-previews/preview-gradient.png`,
 }
 
 export default function StyleCard({ style, isSelected, onClick }: StyleCardProps) {
@@ -44,7 +46,7 @@ export default function StyleCard({ style, isSelected, onClick }: StyleCardProps
       {/* Preview image */}
       <div className="relative">
         {previewSrc ? (
-          <Image
+          <img
             src={previewSrc}
             alt={`${style.name} preview`}
             width={120}
