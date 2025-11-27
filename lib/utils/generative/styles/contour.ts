@@ -207,7 +207,7 @@ function generateTopographic(
   background: string,
   seed: number,
   complexity: number,
-  rng: SeededRandom
+  _rng: SeededRandom
 ) {
   ctx.fillStyle = background
   ctx.fillRect(0, 0, width, height)
@@ -230,7 +230,7 @@ function generateElevation(
   background: string,
   seed: number,
   complexity: number,
-  rng: SeededRandom
+  _rng: SeededRandom
 ) {
   ctx.fillStyle = background
   ctx.fillRect(0, 0, width, height)
@@ -348,7 +348,7 @@ function generateRidges(
   background: string,
   seed: number,
   complexity: number,
-  rng: SeededRandom
+  _rng: SeededRandom
 ) {
   ctx.fillStyle = background
   ctx.fillRect(0, 0, width, height)

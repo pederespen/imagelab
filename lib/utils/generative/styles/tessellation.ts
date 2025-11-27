@@ -368,7 +368,6 @@ function drawPenrose(
   const size = Math.max(width, height) / gridSize
 
   // Golden ratio angles for Penrose-like pattern
-  const phi = (1 + Math.sqrt(5)) / 2
   const angles = [0, Math.PI / 5, (2 * Math.PI) / 5, (3 * Math.PI) / 5, (4 * Math.PI) / 5]
 
   ctx.lineWidth = 1.5

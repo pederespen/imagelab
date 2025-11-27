@@ -173,13 +173,6 @@ export function generateFlowField(
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
 
-  // Map variant names
-  const variantKey = variant
-    .toLowerCase()
-    .replace(' ', '-')
-    .replace('particle trails', 'streamlines')
-    .replace('curl noise', 'curl')
-
   if (variant === 'particle-trails') {
     // Particle mode - dots along flow paths
     drawParticleTrails(
