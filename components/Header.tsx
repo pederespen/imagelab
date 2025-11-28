@@ -61,6 +61,12 @@ export default function Header() {
             >
               Generative Art
             </Link>
+            <Link
+              href="/ai-art"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              AI Art
+            </Link>
 
             <button
               onClick={toggleTheme}
@@ -225,6 +231,13 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Generative Art
+              </Link>
+              <Link
+                href="/ai-art"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                AI Art
               </Link>
             </nav>
           </div>

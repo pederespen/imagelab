@@ -1,3 +1,6 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 const tools = [
@@ -29,6 +32,14 @@ const tools = [
 ]
 
 export default function Home() {
+  const [webGPUSupported, setWebGPUSupported] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    // Check WebGPU support
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setWebGPUSupported(!!(navigator as any).gpu)
+  }, [])
+
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16">
@@ -52,6 +63,34 @@ export default function Home() {
               <p className="text-muted-foreground">{tool.description}</p>
             </Link>
           ))}
+
+          {/* AI Art Generator - requires WebGPU */}
+          {webGPUSupported === true ? (
+            <Link
+              href="/ai-art"
+              className="group bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-8 border border-card-border hover:border-border"
+            >
+              <h2 className="text-2xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
+                AI Art Generator
+              </h2>
+              <p className="text-muted-foreground">
+                Generate artwork from text using AI with artistic style presets
+              </p>
+            </Link>
+          ) : webGPUSupported === false ? (
+            <div className="bg-card rounded-xl shadow-md p-8 border border-card-border opacity-50 cursor-not-allowed">
+              <h2 className="text-2xl font-semibold text-foreground mb-1">AI Art Generator</h2>
+              <p className="text-xs text-muted-foreground mb-3">Requires WebGPU (Chrome 113+)</p>
+              <p className="text-muted-foreground">
+                Generate artwork from text using AI with artistic style presets
+              </p>
+            </div>
+          ) : (
+            <div className="bg-card rounded-xl shadow-md p-8 border border-card-border animate-pulse">
+              <div className="h-8 bg-secondary rounded w-3/4 mb-3" />
+              <div className="h-4 bg-secondary rounded w-full" />
+            </div>
+          )}
         </div>
       </div>
     </main>
