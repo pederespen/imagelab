@@ -32,6 +32,18 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             <Link
+              href="/generative"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Generative Art
+            </Link>
+            <Link
+              href="/text-to-image"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Text-to-Image
+            </Link>
+            <Link
               href="/ascii"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
@@ -54,18 +66,6 @@ export default function Header() {
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Pixelator
-            </Link>
-            <Link
-              href="/generative"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Generative Art
-            </Link>
-            <Link
-              href="/text-to-image"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Text-to-Image
             </Link>
 
             <button
@@ -198,6 +198,20 @@ export default function Header() {
           <div className="md:hidden py-4 border-t border-card-border/60">
             <nav className="flex flex-col space-y-3">
               <Link
+                href="/generative"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Generative Art
+              </Link>
+              <Link
+                href="/text-to-image"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Text-to-Image
+              </Link>
+              <Link
                 href="/ascii"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
@@ -224,20 +238,6 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pixelator
-              </Link>
-              <Link
-                href="/generative"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Generative Art
-              </Link>
-              <Link
-                href="/text-to-image"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Text-to-Image
               </Link>
             </nav>
           </div>

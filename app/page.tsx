@@ -13,6 +13,12 @@ import {
 
 const tools = [
   {
+    name: 'Generative Art',
+    description: 'Create geometric art with customizable palettes',
+    href: '/generative',
+    icon: GenerativeArtIcon,
+  },
+  {
     name: 'Image to ASCII',
     description: 'Convert images into ASCII art with customizable density',
     href: '/ascii',
@@ -35,12 +41,6 @@ const tools = [
     description: 'Convert images to pixel art with adjustable pixel size',
     href: '/pixelator',
     icon: PixelatorIcon,
-  },
-  {
-    name: 'Generative Art',
-    description: 'Create geometric art with customizable palettes',
-    href: '/generative',
-    icon: GenerativeArtIcon,
   },
 ]
 
