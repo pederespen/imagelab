@@ -9,12 +9,12 @@ import {
   getStyleById,
   isWebGPUSupported,
   type ModelStatus,
-} from '@/lib/utils/ai-art'
+} from '@/lib/utils/text-to-image'
 
 // The main language model file - this is the largest and takes the longest
 const MAIN_MODEL_FILE = 'language_model'
 
-export default function AiArtGenerator() {
+export default function TextToImageGenerator() {
   const [subject, setSubject] = useState('')
   const [styleId, setStyleId] = useState('impressionist')
   const [status, setStatus] = useState<ModelStatus>('idle')
@@ -39,7 +39,7 @@ export default function AiArtGenerator() {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    workerRef.current = new Worker('/ai-art.worker.js', { type: 'module' })
+    workerRef.current = new Worker('/text-to-image.worker.js', { type: 'module' })
 
     workerRef.current.onmessage = e => {
       const { type, ...data } = e.data
@@ -110,7 +110,7 @@ export default function AiArtGenerator() {
 
     const link = document.createElement('a')
     link.href = generatedImage
-    link.download = `ai-art-${styleId}-${Date.now()}.png`
+    link.download = `text-to-image-${styleId}-${Date.now()}.png`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -148,7 +148,7 @@ export default function AiArtGenerator() {
     return (
       <Card className="p-8 text-center">
         <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-foreground mb-2">AI Art Generator</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-2">Text-to-Image Generator</h2>
         <p className="text-muted-foreground max-w-md mx-auto mb-4">
           Generate unique artwork from text descriptions using AI, powered by{' '}
           <span className="font-medium text-foreground">Janus-Pro-1B</span> from DeepSeek.

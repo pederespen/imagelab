@@ -62,10 +62,10 @@ export default function Header() {
               Generative Art
             </Link>
             <Link
-              href="/ai-art"
+              href="/text-to-image"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              AI Art
+              Text-to-Image
             </Link>
 
             <button
@@ -233,11 +233,11 @@ export default function Header() {
                 Generative Art
               </Link>
               <Link
-                href="/ai-art"
+                href="/text-to-image"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                AI Art
+                Text-to-Image
               </Link>
             </nav>
           </div>

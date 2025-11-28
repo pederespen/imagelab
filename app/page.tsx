@@ -64,25 +64,25 @@ export default function Home() {
             </Link>
           ))}
 
-          {/* AI Art Generator - requires WebGPU */}
+          {/* Text-to-Image Generator - requires WebGPU */}
           {webGPUSupported === true ? (
             <Link
-              href="/ai-art"
+              href="/text-to-image"
               className="group bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-8 border border-card-border hover:border-border"
             >
               <h2 className="text-2xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
-                AI Art Generator
+                Text-to-Image
               </h2>
               <p className="text-muted-foreground">
-                Generate artwork from text using AI with artistic style presets
+                Generate artwork from text descriptions using AI
               </p>
             </Link>
           ) : webGPUSupported === false ? (
             <div className="bg-card rounded-xl shadow-md p-8 border border-card-border opacity-50 cursor-not-allowed">
-              <h2 className="text-2xl font-semibold text-foreground mb-1">AI Art Generator</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-1">Text-to-Image</h2>
               <p className="text-xs text-muted-foreground mb-3">Requires WebGPU (Chrome 113+)</p>
               <p className="text-muted-foreground">
-                Generate artwork from text using AI with artistic style presets
+                Generate artwork from text descriptions using AI
               </p>
             </div>
           ) : (
