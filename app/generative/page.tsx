@@ -2,7 +2,7 @@ import GenerativeArt from '@/components/tools/GenerativeArt'
 
 export const metadata = {
   title: 'Generative Art - ImageLab',
-  description: 'Create Bauhaus-inspired geometric art with customizable palettes',
+  description: 'Create geometric art with customizable palettes',
 }
 
 export default function GenerativePage() {

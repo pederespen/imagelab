@@ -17,6 +17,14 @@ export interface ArtStyle {
 // - "Astronaut in a jungle, cold color palette, muted colors, detailed, 8k"
 
 export const ART_STYLES: ArtStyle[] = [
+  // No Style (Default)
+  {
+    id: 'none',
+    name: 'No Style',
+    promptSuffix: 'highly detailed, 8k, professional quality, digital art',
+    category: 'modern',
+  },
+
   // Classic Art Movements
   {
     id: 'impressionist',

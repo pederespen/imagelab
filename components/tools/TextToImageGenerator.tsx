@@ -16,7 +16,7 @@ const MAIN_MODEL_FILE = 'language_model'
 
 export default function TextToImageGenerator() {
   const [subject, setSubject] = useState('')
-  const [styleId, setStyleId] = useState('impressionist')
+  const [styleId, setStyleId] = useState('none')
   const [status, setStatus] = useState<ModelStatus>('idle')
   const [error, setError] = useState<string | null>(null)
   const [loadingProgress, setLoadingProgress] = useState<{
@@ -146,70 +146,73 @@ export default function TextToImageGenerator() {
   // Initial state - prompt to load model
   if (status === 'idle' || status === 'checking') {
     return (
-      <Card className="p-8 text-center">
-        <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-foreground mb-2">Text-to-Image Generator</h2>
-        <p className="text-muted-foreground max-w-md mx-auto mb-4">
-          Generate unique artwork from text descriptions using AI, powered by{' '}
-          <span className="font-medium text-foreground">Janus-Pro-1B</span> from DeepSeek.
-        </p>
-        <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6">
-          🔒 100% private — runs entirely in your browser using WebGPU. No data is sent to any
-          server. The model (~1.4 GB) will be downloaded and cached locally.
-        </p>
-        <Button onClick={handleLoadModel} size="lg" disabled={status === 'checking'}>
-          {status === 'checking' ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Checking...
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4 mr-2" />
-              Load Model & Start
-            </>
-          )}
-        </Button>
-        <p className="text-xs text-muted-foreground mt-4">
-          First load may take 30-60 seconds. Subsequent visits will be faster.
-        </p>
-      </Card>
+      <div className="flex items-center justify-center min-h-[60vh] p-8">
+        <div className="text-center max-w-2xl">
+          <Sparkles className="w-16 h-16 text-primary mx-auto mb-6" />
+          <h2 className="text-3xl font-semibold text-foreground mb-4">Text-to-Image Generator</h2>
+          <p className="text-lg text-muted-foreground mb-4">
+            Generate unique artwork from text descriptions using AI, powered by{' '}
+            <span className="font-medium text-foreground">Janus-Pro-1B</span> from DeepSeek.
+          </p>
+          <p className="text-sm text-muted-foreground mb-8">
+            🔒 100% private — runs entirely in your browser using WebGPU. No data is sent to any
+            server. The model (~1.4 GB) will be downloaded and cached locally.
+          </p>
+          <Button onClick={handleLoadModel} size="lg" disabled={status === 'checking'}>
+            {status === 'checking' ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Checking...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 mr-2" />
+                Load Model & Start
+              </>
+            )}
+          </Button>
+          <p className="text-xs text-muted-foreground mt-4">
+            First load may take 30-60 seconds. Subsequent visits will be faster.
+          </p>
+        </div>
+      </div>
     )
   }
 
   // Loading model
   if (status === 'loading') {
     return (
-      <Card className="p-8">
-        <h2 className="text-xl font-semibold text-foreground mb-4 text-center">Loading Model...</h2>
-        <p className="text-muted-foreground text-center mb-6">
-          Downloading and initializing the AI model. This may take a minute.
-        </p>
-        <div className="max-w-lg mx-auto">
-          {loadingProgress ? (
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-foreground">Downloading model</span>
-                <span className="text-muted-foreground">
-                  {loadingProgress.progress.toFixed(0)}%
-                  {loadingProgress.total > 0 && ` (${formatBytes(loadingProgress.total)})`}
-                </span>
+      <div className="flex items-center justify-center min-h-[60vh] p-8">
+        <div className="text-center max-w-2xl">
+          <h2 className="text-3xl font-semibold text-foreground mb-6">Loading Model...</h2>
+          <p className="text-lg text-muted-foreground mb-8">
+            Downloading and initializing the AI model. This may take a minute.
+          </p>
+          <div className="max-w-lg mx-auto">
+            {loadingProgress ? (
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-foreground">Downloading model</span>
+                  <span className="text-muted-foreground">
+                    {loadingProgress.progress.toFixed(0)}%
+                  </span>
+                </div>
+                <div className="w-full bg-secondary rounded-full h-3 overflow-hidden">
+                  <div
+                    className="bg-primary h-full transition-all duration-300"
+                    style={{ width: `${loadingProgress.progress}%` }}
+                  />
+                </div>
               </div>
-              <div className="w-full bg-secondary rounded-full h-3 overflow-hidden">
-                <div
-                  className="bg-primary h-full transition-all duration-300"
-                  style={{ width: `${loadingProgress.progress}%` }}
-                />
+            ) : (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                <span className="ml-2 text-muted-foreground">Initializing...</span>
               </div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center py-4">
-              <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              <span className="ml-2 text-muted-foreground">Initializing...</span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </Card>
+      </div>
     )
   }
 
