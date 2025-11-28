@@ -1,7 +1,7 @@
 // AI Art Generator Web Worker
-// Uses @huggingface/transformers with Janus-1.3B-ONNX for text-to-image generation
+// Uses @huggingface/transformers with Janus-Pro-1B-ONNX for text-to-image generation
 
-const MODEL_ID = 'onnx-community/Janus-1.3B-ONNX'
+const MODEL_ID = 'onnx-community/Janus-Pro-1B-ONNX'
 
 // Dynamic import from CDN
 let transformers = null
@@ -133,10 +133,10 @@ async function generate(prompt) {
     const startTime = performance.now()
     const [processor, model] = await getInstance()
 
-    // Prepare conversation for text-to-image
+    // Prepare conversation for text-to-image (Janus-Pro uses <|User|> role format)
     const conversation = [
       {
-        role: 'User',
+        role: '<|User|>',
         content: prompt,
       },
     ]

@@ -9,14 +9,7 @@ import {
   getStyleById,
   isWebGPUSupported,
   type ModelStatus,
-  type ProgressInfo,
 } from '@/lib/utils/ai-art'
-
-interface ProgressItem {
-  file: string
-  progress: number
-  total: number
-}
 
 // The main language model file - this is the largest and takes the longest
 const MAIN_MODEL_FILE = 'language_model'
@@ -156,9 +149,13 @@ export default function AiArtGenerator() {
       <Card className="p-8 text-center">
         <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
         <h2 className="text-xl font-semibold text-foreground mb-2">AI Art Generator</h2>
-        <p className="text-muted-foreground max-w-md mx-auto mb-6">
-          Generate unique artwork from text descriptions using AI. The model (~1.3GB) will be
-          downloaded and cached in your browser.
+        <p className="text-muted-foreground max-w-md mx-auto mb-4">
+          Generate unique artwork from text descriptions using AI, powered by{' '}
+          <span className="font-medium text-foreground">Janus-Pro-1B</span> from DeepSeek.
+        </p>
+        <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6">
+          🔒 100% private — runs entirely in your browser using WebGPU. No data is sent to any
+          server. The model (~1.4 GB) will be downloaded and cached locally.
         </p>
         <Button onClick={handleLoadModel} size="lg" disabled={status === 'checking'}>
           {status === 'checking' ? (
@@ -233,10 +230,10 @@ export default function AiArtGenerator() {
   // Ready / Generating state
   return (
     <div className="w-full h-full flex flex-col gap-4">
-      <div className="grid lg:grid-cols-3 gap-4 flex-1 min-h-0">
+      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 flex-1 min-h-0">
         {/* Image Preview Area */}
-        <div className="lg:col-span-2 flex flex-col gap-2 min-h-0">
-          <div className="bg-muted rounded-lg overflow-hidden flex-1 flex items-center justify-center border-2 border-border min-h-[500px] relative">
+        <div className="lg:col-span-2 flex flex-col gap-2 min-h-0 order-2 lg:order-1">
+          <div className="bg-muted rounded-lg overflow-hidden flex-1 flex items-center justify-center border-2 border-border min-h-[300px] lg:min-h-[500px] relative">
             {status === 'generating' ? (
               <div className="text-center p-8">
                 <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
@@ -259,14 +256,11 @@ export default function AiArtGenerator() {
                 )}
               </div>
             ) : generatedImage ? (
-              <div className="p-6 flex items-center justify-center w-full h-full">
-                <img
-                  src={generatedImage}
-                  alt="Generated artwork"
-                  className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg shadow-lg"
-                  style={{ minWidth: '384px', minHeight: '384px' }}
-                />
-              </div>
+              <img
+                src={generatedImage}
+                alt="Generated artwork"
+                className="w-full h-full object-contain rounded-lg"
+              />
             ) : (
               <div className="text-center text-muted-foreground p-8">
                 <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -278,7 +272,7 @@ export default function AiArtGenerator() {
         </div>
 
         {/* Controls Panel */}
-        <div>
+        <div className="order-1 lg:order-2">
           <Card className="h-full flex flex-col">
             <CardHeader className="pb-3">
               <CardTitle>Generate Art</CardTitle>
