@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Download, Sparkles, AlertCircle, Loader2 } from 'lucide-react'
 import { Button, Card, CardHeader, CardTitle, Dropdown } from '@/components/ui'
+import { getAssetPath } from '@/lib/utils/assets'
 import {
   ART_STYLES,
   buildPrompt,
@@ -39,7 +40,7 @@ export default function TextToImageGenerator() {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    workerRef.current = new Worker('/text-to-image.worker.js', { type: 'module' })
+    workerRef.current = new Worker(getAssetPath('/text-to-image.worker.js'), { type: 'module' })
 
     workerRef.current.onmessage = e => {
       const { type, ...data } = e.data
