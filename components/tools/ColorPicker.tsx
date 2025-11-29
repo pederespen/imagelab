@@ -207,7 +207,6 @@ export default function ColorPicker() {
                 onMouseLeave={handleImageMouseLeave}
                 className="relative cursor-crosshair w-full h-full flex items-center justify-center p-4"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={imageSrc}
                   alt="Uploaded image"

@@ -380,10 +380,8 @@ export default function AsciiConverter() {
             )}
             {previewUrl ? (
               isGifFile ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
                 <img src={previewUrl} alt="Original GIF" className="w-full h-full object-contain" />
               ) : (
-                /* eslint-disable-next-line @next/next/no-img-element */
                 <img src={previewUrl} alt="Original" className="w-full h-full object-contain" />
               )
             ) : (

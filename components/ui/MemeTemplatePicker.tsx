@@ -77,7 +77,6 @@ export default function MemeTemplatePicker({
                   </div>
                 ) : (
                   <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={getAssetPath(template.imagePath)}
                       alt={template.name}

@@ -46,7 +46,6 @@ export default function StyleCard({ style, isSelected, onClick }: StyleCardProps
       {/* Preview image */}
       <div className="relative">
         {previewSrc ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={previewSrc}
             alt={`${style.name} preview`}

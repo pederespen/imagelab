@@ -14,7 +14,6 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2 group">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={getAssetPath(
                 theme === 'dark' ? '/imagelab-logo-dark.png' : '/imagelab-logo-light.png'

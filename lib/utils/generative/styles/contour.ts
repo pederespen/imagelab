@@ -175,16 +175,16 @@ export function generateContour(
 
   switch (variant) {
     case 'topographic':
-      generateTopographic(ctx, width, height, colors, background, seed, complexity, rng)
+      generateTopographic(ctx, width, height, colors, background, seed, complexity)
       break
     case 'elevation':
-      generateElevation(ctx, width, height, colors, background, seed, complexity, rng)
+      generateElevation(ctx, width, height, colors, background, seed, complexity)
       break
     case 'islands':
       generateIslands(ctx, width, height, colors, background, seed, complexity, rng)
       break
     case 'ridges':
-      generateRidges(ctx, width, height, colors, background, seed, complexity, rng)
+      generateRidges(ctx, width, height, colors, background, seed, complexity)
       break
     case 'thermal':
       generateThermal(ctx, width, height, colors, background, seed, complexity, rng)
@@ -206,8 +206,7 @@ function generateTopographic(
   colors: string[],
   background: string,
   seed: number,
-  complexity: number,
-  _rng: SeededRandom
+  complexity: number
 ) {
   ctx.fillStyle = background
   ctx.fillRect(0, 0, width, height)
@@ -229,8 +228,7 @@ function generateElevation(
   colors: string[],
   background: string,
   seed: number,
-  complexity: number,
-  _rng: SeededRandom
+  complexity: number
 ) {
   ctx.fillStyle = background
   ctx.fillRect(0, 0, width, height)
@@ -347,8 +345,7 @@ function generateRidges(
   colors: string[],
   background: string,
   seed: number,
-  complexity: number,
-  _rng: SeededRandom
+  complexity: number
 ) {
   ctx.fillStyle = background
   ctx.fillRect(0, 0, width, height)

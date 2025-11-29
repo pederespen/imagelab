@@ -398,7 +398,7 @@ export function loadImageData(file: File): Promise<ImageData> {
         resolve(imageData)
       }
 
-      img.onerror = _error => {
+      img.onerror = () => {
         reject(new Error('Failed to load image'))
       }
 

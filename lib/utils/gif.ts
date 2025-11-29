@@ -105,7 +105,7 @@ export async function parseGifFrames(file: File): Promise<GifFrame[]> {
 /**
  * Create an animated GIF preview from frames
  */
-export function createGifPreview(_frames: GifFrame[]): string {
+export function createGifPreview(): string {
   // For preview, we'll use the original file's blob URL
   // This function is kept for potential future use
   return ''

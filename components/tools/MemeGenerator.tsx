@@ -91,7 +91,6 @@ export default function MemeGenerator() {
 
     window.addEventListener('paste', handlePaste)
     return () => window.removeEventListener('paste', handlePaste)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Handle keyboard input for selected text layer
